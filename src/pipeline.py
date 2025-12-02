@@ -46,7 +46,7 @@ def get_user_response(transcript):
 def ask_claude(prompt):
     """Send a prompt to Claude and get the response back."""
     response = claude.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4096,
         temperature=0,
         messages=[{"role": "user", "content": prompt}]
