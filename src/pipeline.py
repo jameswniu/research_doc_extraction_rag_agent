@@ -57,7 +57,7 @@ def find_question_columns(df):
 def column_to_question(column_name):
     """
     Turn a column name into a readable question.
-    'vpn_selection' -> 'What are your thoughts on vpn selection?'
+    This is a fallback - prefer infer_question_from_responses when you have data.
     """
     # Replace underscores with spaces
     text = column_name.replace('_', ' ')
@@ -70,6 +70,34 @@ def column_to_question(column_name):
     
     # Make it a question
     return f"What are your thoughts on {text}?"
+
+
+def infer_question_from_responses(column_name, sample_responses):
+    """
+    Use Claude to figure out what question was asked based on how people answered.
+    Much better than guessing from the column name alone.
+    """
+    # Take first 5 responses as examples
+    examples = "\n".join([f"- {r[:150]}" for r in sample_responses[:5]])
+    
+    prompt = f"""Look at these survey responses and figure out what question was asked.
+
+Column name: {column_name}
+
+Sample responses:
+{examples}
+
+Return ONLY the question that was likely asked. No explanation, just the question.
+Make it natural and specific. End with a question mark."""
+
+    response = ask_claude(prompt)
+    
+    # Clean up the response
+    question = response.strip()
+    if not question.endswith('?'):
+        question += '?'
+    
+    return question
 
 
 def get_user_response(transcript):
@@ -337,11 +365,32 @@ def run(excel_file, output_file):
         print(f"  - {col}")
     print()
     
+    # Infer the actual questions from responses
+    print("Inferring questions from responses...")
+    questions = {}
+    for col in question_columns:
+        # Get sample responses to figure out what was asked
+        sample_responses = []
+        for _, row in data.iterrows():
+            text = get_user_response(row[col])
+            if text.strip() and len(text) > 10:
+                sample_responses.append(text)
+            if len(sample_responses) >= 5:
+                break
+        
+        if sample_responses:
+            questions[col] = infer_question_from_responses(col, sample_responses)
+        else:
+            questions[col] = column_to_question(col)
+        
+        print(f"  {col}: {questions[col]}")
+    print()
+    
     print("Analyzing questions:")
     results = {}
     
     for col in question_columns:
-        question_text = column_to_question(col)
+        question_text = questions[col]
         try:
             results[col] = analyze_one_question(col, question_text, data, id_column)
         except Exception as e:
