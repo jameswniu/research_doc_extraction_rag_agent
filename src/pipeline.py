@@ -5,6 +5,10 @@ Takes survey responses from an Excel file, sends them to Claude,
 and gets back organized themes with quotes and summaries.
 
 Questions are extracted dynamically from the Excel columns - no hardcoding.
+
+Models:
+- Claude Opus 4.5: Question inference, theme generation (heavy lifting)
+- GPT-5.1: Summary generation (warmer, more conversational)
 """
 
 import os
@@ -13,9 +17,15 @@ import sys
 import re
 import pandas as pd
 from anthropic import Anthropic
+from openai import OpenAI
 
-# Set up Claude
+# Set up API clients
 claude = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# Model configuration
+CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Heavy lifting: inference, themes
+OPENAI_MODEL = "gpt-5.1"  # Summaries: warmer, conversational
 
 
 def find_question_columns(df):
@@ -153,14 +163,25 @@ def get_user_response(transcript):
 
 
 def ask_claude(prompt):
-    """Send a prompt to Claude and get the response back."""
+    """Send a prompt to Claude Opus 4.5 for heavy lifting tasks."""
     response = claude.messages.create(
-        model="claude-sonnet-4-5-20250929",
+        model=CLAUDE_MODEL,
         max_tokens=8192,
         temperature=0,
         messages=[{"role": "user", "content": prompt}]
     )
     return response.content[0].text
+
+
+def ask_gpt(prompt):
+    """Send a prompt to GPT-5.1 for warmer, conversational summaries."""
+    response = openai_client.chat.completions.create(
+        model=OPENAI_MODEL,
+        max_completion_tokens=1024,
+        temperature=0,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content
 
 
 def get_json_from_response(text):
@@ -360,9 +381,9 @@ def analyze_one_question(column_name, question_text, data, id_column):
     # Add quotes (no duplicates across themes)
     themes = pick_unique_quotes(themes, response_lookup)
     
-    # Ask Claude for the summary
+    # Ask GPT-5.1 for the summary (warmer, more conversational)
     summary_prompt = make_summary_prompt(question_text, themes)
-    summary_response = ask_claude(summary_prompt)
+    summary_response = ask_gpt(summary_prompt)
     
     try:
         summary = get_json_from_response(summary_response)
