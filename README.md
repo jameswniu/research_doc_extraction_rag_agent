@@ -1,56 +1,95 @@
 # Thematic Analysis Pipeline
 
-Turns survey responses into clean, themed insights using Claude.
+LLM-powered thematic analysis for qualitative research using Claude API.
 
-## Architecture
+## System Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Data["Data Layer"]
-        INPUT[Excel File]
-        OUTPUT_JSON[results.json]
-        OUTPUT_MD[report.md]
+    subgraph Input["📥 Input Layer"]
+        EXCEL[("Excel File<br/>(.xlsx)")]
+        CONFIG["Questions<br/>Config"]
     end
 
-    subgraph Analysis["Analysis Layer"]
-        THEME_GEN[Theme Generation]
-        SUMMARY_GEN[Summary Generation]
-        CLAUDE[(Claude API)]
+    subgraph Ingestion["🔄 Data Ingestion"]
+        LOAD["Load Excel<br/>(pandas)"]
+        EXTRACT["Extract User Text<br/>(transcript parsing)"]
+        VALIDATE["Validate Responses<br/>(filter empty)"]
     end
 
-    subgraph Processing["Processing Layer"]
-        EXTRACT[Text Extraction]
-        QUOTES[Quote Selection]
-        CLEAN[Text Cleaning]
+    subgraph Analysis["🧠 Analysis Engine"]
+        subgraph ThemeGen["Theme Generation"]
+            PROMPT1["Build Theme Prompt<br/>(varied metrics rules)"]
+            CLAUDE1[("Claude API<br/>Sonnet 4.5")]
+            PARSE1["Parse JSON Response"]
+        end
+        
+        subgraph QuoteExt["Quote Extraction"]
+            LOOKUP["Build Response Lookup"]
+            UNIQUE["Extract Unique Quotes<br/>(no duplicates)"]
+            LIMIT["Limit 3 per Theme"]
+        end
+        
+        subgraph SummaryGen["Summary Generation"]
+            PROMPT2["Build Summary Prompt"]
+            CLAUDE2[("Claude API<br/>Sonnet 4.5")]
+            PARSE2["Parse JSON Response"]
+        end
     end
 
-    INPUT --> EXTRACT
-    EXTRACT --> THEME_GEN
-    THEME_GEN --> CLAUDE
-    CLAUDE --> QUOTES
-    QUOTES --> SUMMARY_GEN
-    SUMMARY_GEN --> CLAUDE
-    CLAUDE --> CLEAN
-    CLEAN --> OUTPUT_JSON
-    OUTPUT_JSON --> OUTPUT_MD
+    subgraph Processing["⚙️ Post-Processing"]
+        CALC["Calculate Percentages"]
+        SORT["Sort by Count"]
+        CLEAN["Clean Text<br/>(remove em dashes)"]
+    end
+
+    subgraph Output["📤 Output Layer"]
+        JSON[("results.json")]
+        MD[("report.md")]
+    end
+
+    EXCEL --> LOAD
+    CONFIG --> LOAD
+    LOAD --> EXTRACT
+    EXTRACT --> VALIDATE
+    
+    VALIDATE --> PROMPT1
+    PROMPT1 --> CLAUDE1
+    CLAUDE1 --> PARSE1
+    
+    PARSE1 --> LOOKUP
+    VALIDATE --> LOOKUP
+    LOOKUP --> UNIQUE
+    UNIQUE --> LIMIT
+    
+    PARSE1 --> CALC
+    CALC --> SORT
+    SORT --> PROMPT2
+    
+    PROMPT2 --> CLAUDE2
+    CLAUDE2 --> PARSE2
+    
+    LIMIT --> CLEAN
+    PARSE2 --> CLEAN
+    
+    CLEAN --> JSON
+    JSON --> MD
+
+    style CLAUDE1 fill:#f9f,stroke:#333
+    style CLAUDE2 fill:#f9f,stroke:#333
+    style JSON fill:#9f9,stroke:#333
+    style MD fill:#9f9,stroke:#333
 ```
-
-## What It Does
-
-- Reads survey responses from Excel
-- Groups responses into 3 themes per question
-- Picks representative quotes (no duplicates)
-- Writes executive summaries
-- Outputs JSON and Markdown
 
 ## Features
 
 | Feature | Description |
 |---------|-------------|
-| Varied Metrics | Uses ratios, rankings, comparisons (not just percentages) |
-| Varied Openings | Sentences start differently, not always "Participants..." |
-| Unique Quotes | No quote appears twice across themes |
-| Deterministic | Temperature=0 for reproducible results |
+| **3 Themes per Question** | Consistent structure across all analyses |
+| **Varied Metrics** | Ratios, rankings, qualitative (max 1% per theme) |
+| **Varied Openings** | "Privacy dominates...", "Strong preference exists..." |
+| **Unique Quotes** | No duplicates across themes |
+| **Deterministic** | Temperature=0 for reproducible results |
 
 ## Setup
 
@@ -86,6 +125,7 @@ usercue-thematic-analysis/
 ├── output/
 │   ├── results.json
 │   └── report.md
+├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
@@ -113,7 +153,15 @@ usercue-thematic-analysis/
 }
 ```
 
-## Example Theme
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| Model | claude-sonnet-4-5-20250929 |
+| Temperature | 0 |
+| Max Tokens | 4096 |
+
+## Example Output
 
 **Privacy and Security Focus** (37%)
 
