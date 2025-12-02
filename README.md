@@ -133,9 +133,9 @@ Instead of guessing from column names like `vpn_selection`, the pipeline samples
 
 | Column | Inferred Question |
 |--------|-------------------|
-| vpn_selection | What factors influenced your choice of VPN provider? |
-| current_vpn_feedback | What improvements or changes would you like to see with your current VPN service? |
-| remove_data_steps_probe_no | Would you be interested in taking steps to have your personal data removed from data broker websites? |
+| vpn_selection | What factors were most important when selecting your VPN? |
+| current_vpn_feedback | What features do you wish your VPN had? |
+| remove_data_steps_probe_no | Would you be interested in removing your personal information from online databases? |
 
 ## Project Structure
 

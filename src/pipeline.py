@@ -77,8 +77,8 @@ def infer_question_from_responses(column_name, sample_responses):
     Use Claude to figure out what question was asked based on how people answered.
     Much better than guessing from the column name alone.
     """
-    # Take first 5 responses as examples
-    examples = "\n".join([f"- {r[:150]}" for r in sample_responses[:5]])
+    # Take first 10 responses for better inference
+    examples = "\n".join([f"- {r[:200]}" for r in sample_responses[:10]])
     
     prompt = f"""Look at these survey responses and figure out what question was asked.
 
@@ -87,15 +87,49 @@ Column name: {column_name}
 Sample responses:
 {examples}
 
-Return ONLY the question that was likely asked. No explanation, just the question.
-Make it natural and specific. End with a question mark."""
+Based on these responses, what specific question was the participant answering?
+
+STRICT RULES:
+1. STANDALONE - makes complete sense without any prior context
+2. NEVER USE "AND" - absolutely no compound questions. ONE question only.
+3. NO BRAND NAMES - say "your VPN" not any specific product name
+4. NO REFERENCES - never "you mentioned", "as discussed", "the problems above"
+5. CONCISE - under 12 words preferred
+6. PICK ONE TOPIC - if responses cover multiple things, pick the MAIN one
+
+FORBIDDEN PATTERNS (never output these):
+- "X and Y?" 
+- "X and how Y?"
+- "Why X and what Y?"
+- Any question containing the word "and"
+
+EXAMPLES:
+BAD: "What problems have you had and would you want something better?"
+GOOD: "What problems have you experienced with your current VPN?"
+
+BAD: "Why did you remove your data and how satisfied were you?"
+GOOD: "What motivated you to remove your personal data online?"
+
+BAD: "How appealing is X and what are the benefits?"
+GOOD: "How appealing is having a private server location?"
+
+Return ONLY the question. No explanation. Under 12 words. No "and". End with ?"""
 
     response = ask_claude(prompt)
     
     # Clean up the response
     question = response.strip()
+    # Remove any quotes that might wrap the question
+    question = question.strip('"\'')
     if not question.endswith('?'):
         question += '?'
+    
+    # If it still has "and", truncate at the "and"
+    if ' and ' in question.lower():
+        parts = question.split(' and ')
+        question = parts[0].strip()
+        if not question.endswith('?'):
+            question += '?'
     
     return question
 
@@ -122,7 +156,7 @@ def ask_claude(prompt):
     """Send a prompt to Claude and get the response back."""
     response = claude.messages.create(
         model="claude-sonnet-4-5-20250929",
-        max_tokens=4096,
+        max_tokens=8192,
         temperature=0,
         messages=[{"role": "user", "content": prompt}]
     )
@@ -131,16 +165,36 @@ def ask_claude(prompt):
 
 def get_json_from_response(text):
     """
-    Claude sometimes wraps JSON in extra text.
-    This finds the JSON part and parses it.
+    Claude sometimes wraps JSON in code blocks or has minor formatting issues.
+    This finds the JSON part and parses it, with some error recovery.
     """
+    # Remove markdown code blocks if present
+    text = text.replace('```json', '').replace('```', '').strip()
+    
     start = text.find('{')
     end = text.rfind('}') + 1
     
     if start == -1 or end == 0:
         return {}
     
-    return json.loads(text[start:end])
+    json_str = text[start:end]
+    
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        import re
+        
+        # Fix 1: Missing ] to close themes array before final }
+        # Pattern: ]\n  }\n} should be ]\n    }\n  ]\n}
+        json_str = re.sub(r'\]\s*\}\s*\}$', ']\n    }\n  ]\n}', json_str)
+        
+        # Fix 2: Missing } before closing ] of themes array
+        json_str = re.sub(r'"\]\s*\]\s*\}', '"]\n    }\n  ]\n}', json_str)
+        
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError:
+            return {}
 
 
 def make_theme_prompt(question, responses):
@@ -375,7 +429,7 @@ def run(excel_file, output_file):
             text = get_user_response(row[col])
             if text.strip() and len(text) > 10:
                 sample_responses.append(text)
-            if len(sample_responses) >= 5:
+            if len(sample_responses) >= 10:
                 break
         
         if sample_responses:
