@@ -2,27 +2,74 @@
 Thematic Analysis Pipeline
 
 Takes survey responses from an Excel file, sends them to Claude,
-and gets back nicely organized themes with quotes and summaries.
+and gets back organized themes with quotes and summaries.
+
+Questions are extracted dynamically from the Excel columns - no hardcoding.
 """
 
 import os
 import json
 import sys
+import re
 import pandas as pd
 from anthropic import Anthropic
 
 # Set up Claude
 claude = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-# The questions we're analyzing
-QUESTIONS = {
-    "vpn_selection": "When choosing a VPN, what features or capabilities do you consider most important?",
-    "unmet_needs_private_location": "How appealing is the option to set up private server locations, such as your own home?",
-    "unmet_needs_always_avail": "When has your current VPN not met expectations for accessibility or reliability?",
-    "current_vpn_feedback": "What features do you wish your current VPN provider offered that it doesn't today?",
-    "remove_data_steps_probe_yes": "What prompted you to pursue data deletion?",
-    "remove_data_steps_probe_no": "Would you be interested in removing your personal data from websites or online databases?"
-}
+
+def find_question_columns(df):
+    """
+    Figure out which columns contain survey questions (text responses).
+    Skips metadata columns like ID, timestamps, emails, etc.
+    """
+    skip_patterns = [
+        r'^id$', r'_id$', r'timestamp', r'date', r'time', r'email', 
+        r'^name$', r'status', r'completed', r'started', r'duration', 
+        r'^ip', r'browser', r'device', r'source', r'channel'
+    ]
+    
+    question_cols = []
+    
+    for col in df.columns:
+        col_lower = col.lower()
+        
+        # Skip if it looks like metadata
+        if any(re.search(pattern, col_lower) for pattern in skip_patterns):
+            continue
+        
+        # Skip mostly empty columns
+        non_empty = df[col].dropna()
+        if len(non_empty) < 5:
+            continue
+        
+        # Check if it contains text (not just numbers or short codes)
+        sample = non_empty.head(20).astype(str)
+        avg_length = sample.str.len().mean()
+        
+        # Text responses are usually longer than 20 chars on average
+        if avg_length > 20:
+            question_cols.append(col)
+    
+    return question_cols
+
+
+def column_to_question(column_name):
+    """
+    Turn a column name into a readable question.
+    'vpn_selection' -> 'What are your thoughts on vpn selection?'
+    """
+    # Replace underscores with spaces
+    text = column_name.replace('_', ' ')
+    
+    # Add spaces before capitals (handles camelCase)
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    
+    # Clean up and capitalize
+    text = text.strip().lower()
+    
+    # Make it a question
+    return f"What are your thoughts on {text}?"
 
 
 def get_user_response(transcript):
@@ -76,7 +123,6 @@ def make_theme_prompt(question, responses):
     return f"""You are a senior researcher. Executive clarity.
 
 Question: "{question}"
-Domain: VPN/privacy market research
 
 Data:
 {responses}
@@ -175,20 +221,20 @@ def pick_unique_quotes(themes, all_responses):
     return themes
 
 
-def analyze_one_question(question_key, data):
+def analyze_one_question(column_name, question_text, data, id_column):
     """
     Run the full analysis for a single question.
     Returns a dict with themes, quotes, headline, and summary.
     """
-    print(f"  {question_key}...", end=" ", flush=True)
+    print(f"  {column_name}...", end=" ", flush=True)
     
     # Gather all the responses for this question
     responses = []
     for _, row in data.iterrows():
-        text = get_user_response(row[question_key])
+        text = get_user_response(row[column_name])
         if text.strip() and len(text) > 3:
             responses.append({
-                "id": str(row["ID"]),
+                "id": str(row[id_column]),
                 "text": text
             })
     
@@ -197,8 +243,6 @@ def analyze_one_question(question_key, data):
         print("no responses")
         return {"error": "No valid responses"}
     
-    question = QUESTIONS[question_key]
-    
     # Format responses for Claude (trim to 180 chars each to save tokens)
     formatted = "\n".join([
         f"[{r['id']}]: \"{r['text'][:180]}\""
@@ -206,7 +250,7 @@ def analyze_one_question(question_key, data):
     ])
     
     # Ask Claude to create themes
-    theme_prompt = make_theme_prompt(question, formatted)
+    theme_prompt = make_theme_prompt(question_text, formatted)
     theme_response = ask_claude(theme_prompt)
     
     try:
@@ -235,7 +279,7 @@ def analyze_one_question(question_key, data):
     themes = pick_unique_quotes(themes, response_lookup)
     
     # Ask Claude for the summary
-    summary_prompt = make_summary_prompt(question, themes)
+    summary_prompt = make_summary_prompt(question_text, themes)
     summary_response = ask_claude(summary_prompt)
     
     try:
@@ -246,12 +290,21 @@ def analyze_one_question(question_key, data):
     print(f"done ({total})")
     
     return {
-        "question": question,
+        "question": question_text,
         "n_participants": total,
         "headline": summary.get("headline", ""),
         "summary": summary.get("summary", ""),
         "themes": themes
     }
+
+
+def find_id_column(df):
+    """Find the column that contains participant IDs."""
+    for col in df.columns:
+        if col.lower() in ['id', 'participant_id', 'respondent_id', 'user_id']:
+            return col
+    # Fall back to first column if no obvious ID column
+    return df.columns[0]
 
 
 def clean_dashes(obj):
@@ -273,15 +326,27 @@ def run(excel_file, output_file):
     data = pd.read_excel(excel_file)
     print(f"Found {len(data)} rows\n")
     
+    # Find the ID column
+    id_column = find_id_column(data)
+    print(f"Using '{id_column}' as participant ID column\n")
+    
+    # Find question columns dynamically
+    question_columns = find_question_columns(data)
+    print(f"Found {len(question_columns)} question columns:")
+    for col in question_columns:
+        print(f"  - {col}")
+    print()
+    
     print("Analyzing questions:")
     results = {}
     
-    for question_key in QUESTIONS.keys():
+    for col in question_columns:
+        question_text = column_to_question(col)
         try:
-            results[question_key] = analyze_one_question(question_key, data)
+            results[col] = analyze_one_question(col, question_text, data, id_column)
         except Exception as e:
             print(f"failed: {e}")
-            results[question_key] = {"error": str(e)}
+            results[col] = {"error": str(e)}
     
     # Clean up any fancy dashes
     results = clean_dashes(results)

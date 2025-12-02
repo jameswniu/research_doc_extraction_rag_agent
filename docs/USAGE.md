@@ -5,48 +5,52 @@
 ```bash
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY="your-key"
+
 python src/pipeline.py data.xlsx output/results.json
 python src/report.py output/results.json output/report.md
 ```
 
-## Input Format
+## Input Requirements
 
-Your Excel file needs these columns:
+The pipeline works with any Excel file that has:
 
-| Column | What it is |
-|--------|------------|
-| `ID` | Participant ID |
-| `vpn_selection` | Their response about VPN selection |
-| `unmet_needs_private_location` | Their response about private servers |
-| ... | Other question columns |
+1. **An ID column** - Named "ID", "participant_id", "respondent_id", or similar. Falls back to the first column if nothing matches.
 
-Each cell should have transcript text like:
+2. **Question columns** - Any column where responses average more than 20 characters. The pipeline auto-detects these.
+
+### Transcript Format
+
+If your responses are in transcript format, the pipeline extracts just the user parts:
 
 ```
-user: This is what they said
-assistant: Follow-up question
-user: More of their response
+user: I really like the privacy features
+assistant: Can you tell me more?
+user: Especially the no-logs policy
 ```
 
-The pipeline only looks at lines starting with `user:`.
+Gets extracted as: "I really like the privacy features Especially the no-logs policy"
 
-## Output
+## Output Files
 
 ### JSON (results.json)
 
 ```json
 {
-  "vpn_selection": {
-    "question": "When choosing a VPN...",
+  "column_name": {
+    "question": "What are your thoughts on column name?",
     "n_participants": 105,
     "headline": "Short insight",
-    "summary": "Two sentences with percentages",
+    "summary": "Two sentences about the findings.",
     "themes": [
       {
         "title": "Theme Name",
-        "description": "What this theme is about",
+        "description": "Description with varied metrics.",
         "pct": 38,
-        "quotes": [...]
+        "count": 40,
+        "participant_ids": ["101", "102"],
+        "quotes": [
+          {"participant_id": "101", "quote": "What they said"}
+        ]
       }
     ]
   }
@@ -55,31 +59,46 @@ The pipeline only looks at lines starting with `user:`.
 
 ### Markdown (report.md)
 
-A readable report with headlines, summaries, themes, and quotes.
+Human-readable report with headlines, theme descriptions, and quotes.
 
-## Adding New Questions
+## Customization
 
-Edit `QUESTIONS` in pipeline.py:
+### Changing the model
+
+Edit `ask_claude()` in pipeline.py:
 
 ```python
-QUESTIONS = {
-    "your_new_key": "Your new question text?",
+response = claude.messages.create(
+    model="claude-sonnet-4-5-20250929",  # Change this
     ...
-}
+)
 ```
 
-Then make sure your Excel has a column with that key.
+### Adjusting column detection
+
+Edit `find_question_columns()` to change:
+- Which column names to skip (the `skip_patterns` list)
+- Minimum response count (currently 5)
+- Minimum average length (currently 20 chars)
+
+### Changing theme count
+
+Edit `make_theme_prompt()` and change "exactly 3 themes" to whatever you need.
 
 ## Troubleshooting
 
 **"No valid responses"**
-Check that your Excel column names match the keys in QUESTIONS.
+- Check that your Excel has the expected column names
+- Make sure responses aren't all empty or very short
 
 **"Failed to parse themes"**
-Usually means Claude's response wasn't valid JSON. Check your API key and try again.
+- Usually means Claude returned something unexpected
+- Check your API key is valid
+- Try running again (rare API hiccups happen)
 
-**Quotes repeating**
-Shouldn't happen, but if it does, check `pick_unique_quotes` in pipeline.py.
+**Duplicate quotes showing up**
+- The deduplication uses first 100 chars of each quote
+- Very similar responses might slip through
 
 ## Running Tests
 

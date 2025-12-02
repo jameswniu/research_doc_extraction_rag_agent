@@ -1,64 +1,61 @@
 # Thematic Analysis Pipeline
 
-LLM-powered thematic analysis for qualitative research using Claude API.
+Turns survey responses into organized themes using Claude. Drop in an Excel file, get back grouped insights with supporting quotes.
 
-## System Architecture
+## How It Works
 
 ```mermaid
 flowchart TB
-    subgraph Input["📥 Input Layer"]
-        EXCEL[("Excel File<br/>(.xlsx)")]
-        CONFIG["Questions<br/>Config"]
+    subgraph Input["Input"]
+        EXCEL[("Excel File")]
     end
 
-    subgraph Ingestion["🔄 Data Ingestion"]
-        LOAD["Load Excel<br/>(pandas)"]
-        EXTRACT["Extract User Text<br/>(transcript parsing)"]
-        VALIDATE["Validate Responses<br/>(filter empty)"]
+    subgraph Discovery["Column Discovery"]
+        FIND_ID["Find ID Column"]
+        FIND_QS["Find Question Columns<br/>(auto-detect text responses)"]
+        GEN_Q["Generate Question Text<br/>(from column names)"]
     end
 
-    subgraph Analysis["🧠 Analysis Engine"]
+    subgraph Analysis["Analysis Engine"]
         subgraph ThemeGen["Theme Generation"]
-            PROMPT1["Build Theme Prompt<br/>(varied metrics rules)"]
+            PROMPT1["Build Theme Prompt"]
             CLAUDE1[("Claude API<br/>Sonnet 4.5")]
-            PARSE1["Parse JSON Response"]
+            PARSE1["Parse JSON"]
         end
         
         subgraph QuoteExt["Quote Extraction"]
-            LOOKUP["Build Response Lookup"]
-            UNIQUE["Extract Unique Quotes<br/>(no duplicates)"]
+            LOOKUP["Response Lookup"]
+            UNIQUE["Deduplicate Quotes"]
             LIMIT["Limit 3 per Theme"]
         end
         
         subgraph SummaryGen["Summary Generation"]
             PROMPT2["Build Summary Prompt"]
             CLAUDE2[("Claude API<br/>Sonnet 4.5")]
-            PARSE2["Parse JSON Response"]
+            PARSE2["Parse JSON"]
         end
     end
 
-    subgraph Processing["⚙️ Post-Processing"]
+    subgraph Processing["Post-Processing"]
         CALC["Calculate Percentages"]
-        SORT["Sort by Count"]
-        CLEAN["Clean Text<br/>(remove em dashes)"]
+        SORT["Sort by Size"]
+        CLEAN["Clean Text"]
     end
 
-    subgraph Output["📤 Output Layer"]
+    subgraph Output["Output"]
         JSON[("results.json")]
         MD[("report.md")]
     end
 
-    EXCEL --> LOAD
-    CONFIG --> LOAD
-    LOAD --> EXTRACT
-    EXTRACT --> VALIDATE
+    EXCEL --> FIND_ID
+    EXCEL --> FIND_QS
+    FIND_QS --> GEN_Q
     
-    VALIDATE --> PROMPT1
+    GEN_Q --> PROMPT1
     PROMPT1 --> CLAUDE1
     CLAUDE1 --> PARSE1
     
     PARSE1 --> LOOKUP
-    VALIDATE --> LOOKUP
     LOOKUP --> UNIQUE
     UNIQUE --> LIMIT
     
@@ -75,21 +72,30 @@ flowchart TB
     CLEAN --> JSON
     JSON --> MD
 
-    style CLAUDE1 fill:#f9f,stroke:#333
-    style CLAUDE2 fill:#f9f,stroke:#333
-    style JSON fill:#9f9,stroke:#333
-    style MD fill:#9f9,stroke:#333
+    style CLAUDE1 fill:#e8e8e8,stroke:#333
+    style CLAUDE2 fill:#e8e8e8,stroke:#333
+    style JSON fill:#d4edda,stroke:#333
+    style MD fill:#d4edda,stroke:#333
 ```
+
+## What It Does
+
+- Reads any Excel file with survey responses
+- Auto-detects which columns are questions (no hardcoding needed)
+- Groups responses into 3 themes per question
+- Picks representative quotes without duplicates
+- Writes executive summaries
+- Outputs JSON and Markdown
 
 ## Features
 
 | Feature | Description |
 |---------|-------------|
-| **3 Themes per Question** | Consistent structure across all analyses |
-| **Varied Metrics** | Ratios, rankings, qualitative (max 1% per theme) |
-| **Varied Openings** | "Privacy dominates...", "Strong preference exists..." |
-| **Unique Quotes** | No duplicates across themes |
-| **Deterministic** | Temperature=0 for reproducible results |
+| Dynamic Questions | Extracts question columns automatically from your Excel |
+| Varied Metrics | Uses ratios, rankings, comparisons (not just percentages) |
+| Varied Openings | Sentences start differently, not always "Participants..." |
+| Unique Quotes | No quote appears twice across themes |
+| Deterministic | Temperature=0 for reproducible results |
 
 ## Setup
 
@@ -101,12 +107,16 @@ export ANTHROPIC_API_KEY="your-key"
 ## Usage
 
 ```bash
-# Run analysis
-python src/pipeline.py data.xlsx output/results.json
+# Run analysis on any Excel file
+python src/pipeline.py survey_data.xlsx output/results.json
 
-# Generate report
+# Generate markdown report
 python src/report.py output/results.json output/report.md
 ```
+
+The pipeline will automatically find:
+- The ID column (looks for "id", "participant_id", etc.)
+- Question columns (any column with text responses longer than 20 chars average)
 
 ## Project Structure
 
@@ -134,8 +144,8 @@ usercue-thematic-analysis/
 
 ```json
 {
-  "question_key": {
-    "question": "The question text",
+  "column_name": {
+    "question": "What are your thoughts on column name?",
     "n_participants": 105,
     "headline": "Key insight under 12 words",
     "summary": "Two sentences with theme percentages",
@@ -165,7 +175,7 @@ usercue-thematic-analysis/
 
 **Privacy and Security Focus** (37%)
 
-Privacy concerns dominate VPN selection criteria, with no-logs policies ranking as the top priority among participants. Identity protection and data encryption emerge as core requirements, while participants frequently mention protection from hackers and tracking. Strong preference exists for anonymous browsing capabilities and IP address masking. This segment represents premium customers willing to invest in verified privacy solutions.
+Privacy concerns dominate selection criteria, with no-logs policies ranking as the top priority. Encryption strength matters more than server count for this segment. Strong preference exists for transparent security certifications, and most participants specifically mention identity protection. This represents premium customers willing to pay for verified privacy.
 
 ## Tests
 

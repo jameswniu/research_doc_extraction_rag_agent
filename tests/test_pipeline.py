@@ -6,6 +6,7 @@ Run with: pytest tests/ -v
 
 import pytest
 import json
+import pandas as pd
 import sys
 sys.path.insert(0, '../src')
 
@@ -16,7 +17,9 @@ from src.pipeline import (
     clean_dashes,
     make_theme_prompt,
     make_summary_prompt,
-    QUESTIONS
+    find_question_columns,
+    column_to_question,
+    find_id_column
 )
 
 
@@ -155,25 +158,86 @@ class TestPromptBuilders:
         assert "Theme C: 25%" in prompt
 
 
-class TestQuestionConfig:
-    """Make sure all our questions are set up right."""
+class TestColumnDiscovery:
+    """Test the dynamic column detection."""
     
-    def test_all_questions_exist(self):
-        expected = [
-            "vpn_selection",
-            "unmet_needs_private_location",
-            "unmet_needs_always_avail",
-            "current_vpn_feedback",
-            "remove_data_steps_probe_yes",
-            "remove_data_steps_probe_no"
-        ]
+    def test_finds_text_columns(self):
+        # Create a dataframe with text and non-text columns
+        df = pd.DataFrame({
+            "ID": [1, 2, 3, 4, 5, 6],
+            "timestamp": ["2024-01-01"] * 6,
+            "survey_question": [
+                "This is a long text response about VPNs",
+                "Another detailed answer about privacy",
+                "More thoughtful feedback here",
+                "Extended response with lots of detail",
+                "Comprehensive answer to the question",
+                "Detailed thoughts on the topic"
+            ],
+            "short_code": ["A", "B", "A", "C", "B", "A"]
+        })
         
-        for q in expected:
-            assert q in QUESTIONS
+        result = find_question_columns(df)
+        
+        assert "survey_question" in result
+        assert "ID" not in result
+        assert "timestamp" not in result
+        assert "short_code" not in result
     
-    def test_questions_arent_empty(self):
-        for key, text in QUESTIONS.items():
-            assert len(text) > 10, f"{key} question is too short"
+    def test_skips_empty_columns(self):
+        df = pd.DataFrame({
+            "ID": [1, 2, 3, 4, 5, 6],
+            "question": ["answer"] * 6,
+            "mostly_empty": [None, None, None, None, "one", None]
+        })
+        
+        result = find_question_columns(df)
+        
+        assert "mostly_empty" not in result
+
+
+class TestColumnToQuestion:
+    """Test converting column names to readable questions."""
+    
+    def test_snake_case(self):
+        result = column_to_question("vpn_selection")
+        assert "vpn selection" in result.lower()
+    
+    def test_camel_case(self):
+        result = column_to_question("userFeedback")
+        assert "user feedback" in result.lower()
+    
+    def test_returns_question(self):
+        result = column_to_question("anything")
+        assert result.endswith("?")
+
+
+class TestFindIdColumn:
+    """Test ID column detection."""
+    
+    def test_finds_id_column(self):
+        df = pd.DataFrame({
+            "ID": [1, 2, 3],
+            "question": ["a", "b", "c"]
+        })
+        
+        assert find_id_column(df) == "ID"
+    
+    def test_finds_participant_id(self):
+        df = pd.DataFrame({
+            "participant_id": [1, 2, 3],
+            "question": ["a", "b", "c"]
+        })
+        
+        assert find_id_column(df) == "participant_id"
+    
+    def test_falls_back_to_first_column(self):
+        df = pd.DataFrame({
+            "weird_column": [1, 2, 3],
+            "question": ["a", "b", "c"]
+        })
+        
+        assert find_id_column(df) == "weird_column"
 
 
 if __name__ == "__main__":
