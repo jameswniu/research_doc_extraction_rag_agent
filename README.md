@@ -13,7 +13,11 @@ flowchart TB
     subgraph Discovery["Column Discovery"]
         FIND_ID["Find ID Column"]
         FIND_QS["Find Question Columns<br/>(auto-detect text responses)"]
-        GEN_Q["Generate Question Text<br/>(from column names)"]
+    end
+
+    subgraph Inference["Question Inference"]
+        SAMPLE["Sample Responses"]
+        INFER["Ask Claude:<br/>What question was asked?"]
     end
 
     subgraph Analysis["Analysis Engine"]
@@ -49,9 +53,10 @@ flowchart TB
 
     EXCEL --> FIND_ID
     EXCEL --> FIND_QS
-    FIND_QS --> GEN_Q
+    FIND_QS --> SAMPLE
+    SAMPLE --> INFER
     
-    GEN_Q --> PROMPT1
+    INFER --> PROMPT1
     PROMPT1 --> CLAUDE1
     CLAUDE1 --> PARSE1
     
@@ -74,6 +79,7 @@ flowchart TB
 
     style CLAUDE1 fill:#e8e8e8,stroke:#333
     style CLAUDE2 fill:#e8e8e8,stroke:#333
+    style INFER fill:#e8e8e8,stroke:#333
     style JSON fill:#d4edda,stroke:#333
     style MD fill:#d4edda,stroke:#333
 ```
@@ -81,7 +87,8 @@ flowchart TB
 ## What It Does
 
 - Reads any Excel file with survey responses
-- Auto-detects which columns are questions (no hardcoding needed)
+- Auto-detects which columns are questions
+- Infers the actual question text from responses (not just column names)
 - Groups responses into 3 themes per question
 - Picks representative quotes without duplicates
 - Writes executive summaries
@@ -91,7 +98,8 @@ flowchart TB
 
 | Feature | Description |
 |---------|-------------|
-| Dynamic Questions | Extracts question columns automatically from your Excel |
+| Question Inference | Figures out what was asked by looking at responses |
+| Dynamic Columns | Extracts question columns automatically from your Excel |
 | Varied Metrics | Uses ratios, rankings, comparisons (not just percentages) |
 | Varied Openings | Sentences start differently, not always "Participants..." |
 | Unique Quotes | No quote appears twice across themes |
@@ -117,6 +125,17 @@ python src/report.py output/results.json output/report.md
 The pipeline will automatically find:
 - The ID column (looks for "id", "participant_id", etc.)
 - Question columns (any column with text responses longer than 20 chars average)
+- The actual question text (inferred from how people responded)
+
+### Question Inference Example
+
+Instead of guessing from column names like `vpn_selection`, the pipeline samples responses and asks Claude what question was likely asked:
+
+| Column | Inferred Question |
+|--------|-------------------|
+| vpn_selection | What factors influenced your choice of VPN provider? |
+| current_vpn_feedback | What improvements or changes would you like to see with your current VPN service? |
+| remove_data_steps_probe_no | Would you be interested in taking steps to have your personal data removed from data broker websites? |
 
 ## Project Structure
 

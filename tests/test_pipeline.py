@@ -19,7 +19,8 @@ from src.pipeline import (
     make_summary_prompt,
     find_question_columns,
     column_to_question,
-    find_id_column
+    find_id_column,
+    infer_question_from_responses
 )
 
 

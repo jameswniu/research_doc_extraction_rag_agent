@@ -13,7 +13,12 @@ Excel File
 Column Discovery
     - Find ID column (looks for "id", "participant_id", etc.)
     - Find question columns (text responses > 20 chars average)
-    - Generate question text from column names
+    |
+    v
+Question Inference
+    - Sample 5 responses from each column
+    - Ask Claude: "What question was asked here?"
+    - Get natural, specific question text
     |
     v
 For each question column:
@@ -51,6 +56,8 @@ Output (JSON + Markdown)
 ```
 
 ## Key Design Decisions
+
+**Question inference** - Instead of guessing from column names like "vpn_selection", the pipeline samples actual responses and asks Claude what question was likely asked. This produces natural, specific questions like "What factors influenced your choice of VPN provider?"
 
 **Dynamic question detection** - The pipeline doesn't hardcode question names. It looks at column contents and picks out the ones that look like text responses. This makes it work with any survey structure.
 
