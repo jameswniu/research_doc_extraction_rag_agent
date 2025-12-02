@@ -20,8 +20,6 @@ env/
 .DS_Store
 Thumbs.db
 
-output/*.json
-output/*.md
 *.xlsx
 *.xls
 
