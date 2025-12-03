@@ -273,17 +273,25 @@ def make_summary_prompt(question, themes):
     theme_lines = [f"- {t['title']}: {t['pct']}%" for t in themes]
     theme_list = "\n".join(theme_lines)
     
-    return f"""Executive summary.
+    return f"""You are a senior qualitative researcher writing for executive stakeholders.
 
 Question: {question}
 
 Themes:
 {theme_list}
 
-Return JSON only:
-{{"headline": "Under 12 words. Key insight. Say 'participants' NOT 'users'.", "summary": "2 sentences. All three theme %. One recommendation. Say 'participants' NOT 'users'. NO counts."}}
+Write a headline and summary. Be direct, authoritative, insight-driven.
 
-No em dashes."""
+RULES:
+- Use % symbol, never spell out "percent"
+- Say "participants" not "users" or "respondents"  
+- No hedging language ("seems", "appears", "might")
+- No em dashes
+- Lead with the insight, not the method
+- One clear recommendation
+
+Return JSON only:
+{{"headline": "Under 10 words. The key finding.", "summary": "2 sentences max. State the distribution across themes using %. End with one actionable recommendation."}}"""
 
 
 def pick_unique_quotes(themes, all_responses):
@@ -413,7 +421,8 @@ def find_id_column(df):
 def clean_dashes(obj):
     """Replace fancy dashes with regular ones throughout the results."""
     if isinstance(obj, str):
-        return obj.replace('—', '-').replace('–', '-')
+        # em-dash, en-dash, non-breaking hyphen -> regular hyphen
+        return obj.replace('—', '-').replace('–', '-').replace('\u2011', '-')
     elif isinstance(obj, dict):
         return {k: clean_dashes(v) for k, v in obj.items()}
     elif isinstance(obj, list):
