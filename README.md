@@ -1,4 +1,4 @@
-# Thematic Analysis Pipeline
+# Professional Thematic Research Analysis
 
 **Turn messy survey responses into clean research insights-automatically.**
 
