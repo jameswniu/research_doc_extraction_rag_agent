@@ -17,13 +17,13 @@ flowchart TB
 
     subgraph Inference["Question Inference"]
         SAMPLE["Sample Responses"]
-        INFER[("Claude Opus 4.5")]
+        INFER["Ask Claude:<br/>What question was asked?"]
     end
 
     subgraph Analysis["Analysis Engine"]
         subgraph ThemeGen["Theme Generation"]
             PROMPT1["Build Theme Prompt"]
-            CLAUDE1[("Claude Opus 4.5")]
+            CLAUDE1[("Claude API<br/>Sonnet 4.5")]
             PARSE1["Parse JSON"]
         end
         
@@ -35,7 +35,7 @@ flowchart TB
         
         subgraph SummaryGen["Summary Generation"]
             PROMPT2["Build Summary Prompt"]
-            GPT1[("GPT-5.1")]
+            CLAUDE2[("Claude API<br/>Sonnet 4.5")]
             PARSE2["Parse JSON"]
         end
     end
@@ -68,8 +68,8 @@ flowchart TB
     CALC --> SORT
     SORT --> PROMPT2
     
-    PROMPT2 --> GPT1
-    GPT1 --> PARSE2
+    PROMPT2 --> CLAUDE2
+    CLAUDE2 --> PARSE2
     
     LIMIT --> CLEAN
     PARSE2 --> CLEAN
@@ -77,9 +77,9 @@ flowchart TB
     CLEAN --> JSON
     JSON --> MD
 
-    style CLAUDE1 fill:#d4a574,stroke:#333
-    style GPT1 fill:#74b9d4,stroke:#333
-    style INFER fill:#d4a574,stroke:#333
+    style CLAUDE1 fill:#e8e8e8,stroke:#333
+    style CLAUDE2 fill:#e8e8e8,stroke:#333
+    style INFER fill:#e8e8e8,stroke:#333
     style JSON fill:#d4edda,stroke:#333
     style MD fill:#d4edda,stroke:#333
 ```
@@ -98,7 +98,6 @@ flowchart TB
 
 | Feature | Description |
 |---------|-------------|
-| Dual Model | Claude Opus 4.5 for extraction, GPT-5.1 for summaries |
 | Question Inference | Figures out what was asked by looking at responses |
 | Dynamic Columns | Extracts question columns automatically from your Excel |
 | Varied Metrics | Uses ratios, rankings, comparisons (not just percentages) |

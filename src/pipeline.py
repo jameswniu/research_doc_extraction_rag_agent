@@ -5,10 +5,6 @@ Takes survey responses from an Excel file, sends them to Claude,
 and gets back organized themes with quotes and summaries.
 
 Questions are extracted dynamically from the Excel columns - no hardcoding.
-
-Models:
-- Claude Opus 4.5: Question inference, theme generation (heavy lifting)
-- GPT-5.1: Summary generation (warmer, more conversational)
 """
 
 import os
@@ -17,15 +13,9 @@ import sys
 import re
 import pandas as pd
 from anthropic import Anthropic
-from openai import OpenAI
 
-# Set up API clients
+# Set up Claude
 claude = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
-# Model configuration
-CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Heavy lifting: inference, themes
-OPENAI_MODEL = "gpt-5.1"  # Summaries: warmer, conversational
 
 
 def find_question_columns(df):
@@ -163,25 +153,14 @@ def get_user_response(transcript):
 
 
 def ask_claude(prompt):
-    """Send a prompt to Claude Opus 4.5 for heavy lifting tasks."""
+    """Send a prompt to Claude and get the response back."""
     response = claude.messages.create(
-        model=CLAUDE_MODEL,
+        model="claude-sonnet-4-5-20250929",
         max_tokens=8192,
         temperature=0,
         messages=[{"role": "user", "content": prompt}]
     )
     return response.content[0].text
-
-
-def ask_gpt(prompt):
-    """Send a prompt to GPT-5.1 for warmer, conversational summaries."""
-    response = openai_client.chat.completions.create(
-        model=OPENAI_MODEL,
-        max_completion_tokens=1024,
-        temperature=0,
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.choices[0].message.content
 
 
 def get_json_from_response(text):
@@ -273,25 +252,17 @@ def make_summary_prompt(question, themes):
     theme_lines = [f"- {t['title']}: {t['pct']}%" for t in themes]
     theme_list = "\n".join(theme_lines)
     
-    return f"""You are a senior qualitative researcher writing for executive stakeholders.
+    return f"""Executive summary.
 
 Question: {question}
 
 Themes:
 {theme_list}
 
-Write a headline and summary. Be direct, authoritative, insight-driven.
-
-RULES:
-- Use % symbol, never spell out "percent"
-- Say "participants" not "users" or "respondents"  
-- No hedging language ("seems", "appears", "might")
-- No em dashes
-- Lead with the insight, not the method
-- One clear recommendation
-
 Return JSON only:
-{{"headline": "Under 10 words. The key finding.", "summary": "2 sentences max. State the distribution across themes using %. End with one actionable recommendation."}}"""
+{{"headline": "Under 12 words. Key insight. Say 'participants' NOT 'users'.", "summary": "2 sentences. All three theme %. One recommendation. Say 'participants' NOT 'users'. NO counts."}}
+
+No em dashes."""
 
 
 def pick_unique_quotes(themes, all_responses):
@@ -389,9 +360,9 @@ def analyze_one_question(column_name, question_text, data, id_column):
     # Add quotes (no duplicates across themes)
     themes = pick_unique_quotes(themes, response_lookup)
     
-    # Ask GPT-5.1 for the summary (warmer, more conversational)
+    # Ask Claude for the summary
     summary_prompt = make_summary_prompt(question_text, themes)
-    summary_response = ask_gpt(summary_prompt)
+    summary_response = ask_claude(summary_prompt)
     
     try:
         summary = get_json_from_response(summary_response)
@@ -421,8 +392,7 @@ def find_id_column(df):
 def clean_dashes(obj):
     """Replace fancy dashes with regular ones throughout the results."""
     if isinstance(obj, str):
-        # em-dash, en-dash, non-breaking hyphen -> regular hyphen
-        return obj.replace('—', '-').replace('–', '-').replace('\u2011', '-')
+        return obj.replace('—', '-').replace('–', '-')
     elif isinstance(obj, dict):
         return {k: clean_dashes(v) for k, v in obj.items()}
     elif isinstance(obj, list):

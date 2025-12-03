@@ -4,18 +4,11 @@
 
 ```bash
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY="your-claude-key"
-export OPENAI_API_KEY="your-openai-key"
+export ANTHROPIC_API_KEY="your-key"
 
 python src/pipeline.py data.xlsx output/results.json
 python src/report.py output/results.json output/report.md
 ```
-
-## Model Architecture
-
-The pipeline uses two models:
-- **Claude Opus 4.5** - Question inference and theme extraction (heavy lifting)
-- **GPT-5.1** - Executive summary generation (warmer, conversational)
 
 ## Input Requirements
 
@@ -70,13 +63,15 @@ Human-readable report with headlines, theme descriptions, and quotes.
 
 ## Customization
 
-### Changing the models
+### Changing the model
 
-Edit the model constants at the top of pipeline.py:
+Edit `ask_claude()` in pipeline.py:
 
 ```python
-CLAUDE_MODEL = "claude-opus-4-5-20251101"  # For extraction
-OPENAI_MODEL = "gpt-5.1"  # For summaries
+response = claude.messages.create(
+    model="claude-sonnet-4-5-20250929",  # Change this
+    ...
+)
 ```
 
 ### Adjusting column detection

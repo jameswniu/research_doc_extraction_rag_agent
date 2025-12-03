@@ -1,25 +1,31 @@
 {
   "vpn_selection": {
-    "question": "What factors influenced your choice of VPN provider?",
+    "question": "What factors were most important when selecting your VPN?",
     "n_participants": 105,
-    "headline": "Privacy, Value, and Reliability Drive VPN Choice",
-    "summary": "Participants primarily chose VPNs to protect privacy and identity (38%), followed by value and practical utility (36%), with performance and reliability as a strong third factor (26%). Providers should lead with clear privacy protections while transparently packaging performance guarantees and practical features into simple, value-focused plans.",
+    "headline": "Privacy Dominates VPN Selection for Nearly Half of Participants",
+    "summary": "When selecting a VPN, 45% of participants prioritized privacy and security as non-negotiable requirements, while 28% focused on practical considerations and ease of use, and 27% emphasized performance and accessibility. Organizations should lead with robust security features while ensuring their VPN solutions remain user-friendly and performant to address the full spectrum of participant needs.",
     "themes": [
       {
-        "title": "Privacy and Identity Protection Drive Selection",
-        "description": "Privacy concerns dominate VPN selection criteria, with no-logs policies ranking as the top priority among this segment. Strong preference exists for identity masking, tracking prevention, and protection from hackers accessing personal information. Participants frequently mention wanting to browse anonymously, avoid cookies, and keep their location hidden from surveillance. This segment represents privacy-conscious participants willing to prioritize security features over cost, indicating opportunity for premium privacy-focused product positioning.",
+        "title": "Privacy and Security as Non-Negotiable Requirements",
+        "description": "No-logs policies rank as the top selection criterion, with encryption and identity protection mentioned nearly twice as often as any other feature. Strong preference exists for VPNs that prevent tracking, hacking, and data theft, with participants specifically emphasizing protection from \"bad actors\" and unauthorized access. Privacy concerns outweigh convenience considerations by a significant margin, as most participants frame security as the foundational requirement rather than an optional feature. This segment represents premium customers willing to prioritize verified privacy protections over cost savings.",
         "participant_ids": [
           "4434",
           "4435",
           "4444",
+          "4449",
           "4453",
+          "4458",
           "4459",
           "4460",
-          "4467",
           "4468",
+          "4471",
+          "4473",
           "4475",
+          "4479",
           "4480",
           "4483",
+          "4496",
+          "4505",
           "4510",
           "4516",
           "4520",
@@ -33,9 +39,11 @@
           "4724",
           "4725",
           "4732",
+          "4735",
           "4742",
           "4746",
           "4763",
+          "4775",
           "4804",
           "4805",
           "4808",
@@ -44,14 +52,13 @@
           "4814",
           "4816",
           "4818",
-          "4820",
           "4822",
           "4824",
           "4830",
           "4832"
         ],
-        "count": 40,
-        "pct": 38,
+        "count": 47,
+        "pct": 45,
         "quotes": [
           {
             "participant_id": "4434",
@@ -68,50 +75,41 @@
         ]
       },
       {
-        "title": "Value and Practical Utility Guide Decisions",
-        "description": "Cost sensitivity combines with practical functionality needs, where price matters more than advanced features for this segment. Geo-unlocking capabilities for streaming content and accessing region-restricted media emerge as key use cases alongside work-related access requirements. Ease of use and cross-device compatibility rank highly, with several participants noting they chose free options or employer-provided solutions. Majority mention convenience factors like browser integration and simple setup, representing a value-conscious segment that prioritizes accessibility and affordability over premium security features.",
+        "title": "Practical Considerations and Ease of Use",
+        "description": "Cost sensitivity and convenience outweigh technical specifications for this segment, with free options and employer-provided solutions representing the majority of selection drivers. Ease of use ranks as the decisive factor, with participants prioritizing simple setup, cross-device compatibility, and intuitive interfaces over advanced features. Customer support and user reviews matter more than encryption protocols, as nearly all participants in this group mention recommendations, reputation, or pre-existing relationships as their primary selection method. This segment requires streamlined onboarding and clear value communication rather than technical differentiation.",
         "participant_ids": [
           "4450",
           "4451",
-          "4457",
-          "4458",
           "4461",
-          "4466",
+          "4467",
           "4470",
-          "4477",
-          "4479",
           "4481",
           "4484",
           "4491",
-          "4496",
-          "4505",
           "4519",
           "4531",
           "4532",
           "4535",
           "4550",
           "4553",
-          "4555",
-          "4711",
-          "4735",
-          "4741",
-          "4748",
+          "4561",
+          "4573",
+          "4736",
+          "4749",
           "4750",
           "4751",
-          "4756",
           "4765",
-          "4775",
           "4781",
           "4790",
           "4807",
           "4809",
-          "4811",
-          "4813",
+          "4820",
           "4825",
+          "4829",
           "4846"
         ],
-        "count": 38,
-        "pct": 36,
+        "count": 29,
+        "pct": 28,
         "quotes": [
           {
             "participant_id": "4450",
@@ -122,80 +120,83 @@
             "quote": "It came with my phone. Security."
           },
           {
-            "participant_id": "4457",
-            "quote": "what and where I can access different countries streaming"
+            "participant_id": "4461",
+            "quote": "I use what is recommended by my security service"
           }
         ]
       },
       {
-        "title": "Performance and Reliability Are Primary Concerns",
-        "description": "Speed and connection reliability outweigh other factors for this segment, with fast performance ranking as the decisive selection criterion. Server network size and geographic coverage matter significantly, as participants seek consistent connections across multiple locations. Nearly all in this group emphasize wanting a VPN that works seamlessly without disrupting their regular internet activities. This performance-focused segment suggests strong market demand for VPNs that can demonstrate measurable speed benchmarks and uptime guarantees.",
+        "title": "Performance and Accessibility Drive Selection",
+        "description": "Speed and network quality emerge as primary concerns, with server location availability ranking equally important for accessing geo-restricted content. Participants in this segment mention streaming services, international media access, and connection reliability more than security protocols. The ability to select from multiple server locations matters more than encryption strength, with roughly half specifically citing Netflix access or regional content unlocking as key use cases. This represents opportunity customers seeking functional benefits rather than privacy-first solutions.",
         "participant_ids": [
           "4446",
-          "4449",
-          "4471",
-          "4473",
+          "4457",
+          "4466",
+          "4477",
           "4485",
           "4489",
-          "4490",
           "4513",
           "4514",
           "4528",
           "4549",
-          "4561",
-          "4573",
+          "4555",
           "4709",
+          "4711",
           "4728",
-          "4736",
           "4739",
-          "4749",
+          "4741",
+          "4748",
           "4754",
+          "4756",
           "4760",
           "4801",
+          "4811",
+          "4813",
           "4826",
-          "4829",
           "4835",
           "4840",
           "4843",
           "4845"
         ],
-        "count": 27,
-        "pct": 26,
+        "count": 28,
+        "pct": 27,
         "quotes": [
           {
             "participant_id": "4446",
             "quote": "Something important assignment to do Important tasks can be done by using VPN service providers such as the Web site and the Internet Archive Service The speed of the internet, and security is the most fundamental aspect of the digital internet that we can access"
           },
           {
-            "participant_id": "4449",
-            "quote": "Security"
+            "participant_id": "4457",
+            "quote": "what and where I can access different countries streaming"
           },
           {
-            "participant_id": "4471",
-            "quote": "I want it to be very reliable and secure. It must be top quality. I need a reliable connection and I must be sure that my security is not compromised when I use it."
+            "participant_id": "4466",
+            "quote": "reputation, cost, reliability, other users opinions"
           }
         ]
       }
     ]
   },
   "unmet_needs_private_location": {
-    "question": "How important is having a private server location to you?",
+    "question": "How important is having a private server location with your VPN?",
     "n_participants": 106,
-    "headline": "Private server location is a polarizing value driver",
-    "summary": "Privacy and security strongly motivate 46% of participants, while 37% see private server location as a nice-to-have and 17% reject it as unnecessary or counterproductive. Prioritize private server options for privacy-focused participants while keeping it optional and clearly communicated to avoid overengineering for others.",
+    "headline": "Private Server Location Matters Most to Privacy-Conscious Participants",
+    "summary": "Privacy-focused participants (53%) highly value private server locations for control and protection, while minimalist participants (23%) see limited personal need and uncertain participants (22%) lack understanding of the feature's value. Recommend educational content explaining private server benefits to convert uncertain and minimalist participants into recognizing its security advantages.",
     "themes": [
       {
-        "title": "Privacy and Security Protection Drives Strong Appeal",
-        "description": "Security concerns dominate this segment's interest in private server locations, with identity protection ranking as the top priority. Strong preference exists for features that mask personal location and prevent hacking, particularly when using public Wi-Fi or conducting financial activities. Most participants specifically mention wanting to keep their home address hidden and maintain anonymity while browsing. The ability to control personal data and create a 'safety net' emerges as a key value driver. This represents a premium customer segment willing to invest in enhanced privacy features for peace of mind.",
+        "title": "Privacy-Focused Users Value Control and Protection",
+        "description": "Security and privacy concerns rank as the primary drivers for this segment, with location masking and identity protection mentioned most frequently. Strong preference exists for control over personal data and server locations, particularly for financial activities and sensitive browsing. Participants emphasize protection from hackers, doxxing, and tracking as core benefits. This segment represents premium customers willing to invest in comprehensive privacy features and personal server configurations.",
         "participant_ids": [
           "4444",
-          "4446",
+          "4450",
           "4453",
           "4457",
           "4458",
           "4460",
           "4461",
           "4467",
+          "4468",
+          "4470",
           "4477",
           "4479",
           "4480",
@@ -207,17 +208,21 @@
           "4513",
           "4514",
           "4531",
-          "4550",
+          "4543",
           "4553",
           "4559",
           "4566",
           "4709",
+          "4724",
+          "4732",
           "4735",
           "4736",
           "4739",
           "4748",
           "4749",
+          "4750",
           "4751",
+          "4754",
           "4781",
           "4790",
           "4801",
@@ -225,29 +230,30 @@
           "4809",
           "4810",
           "4812",
+          "4813",
           "4816",
           "4820",
           "4822",
           "4824",
           "4826",
-          "4829",
           "4830",
           "4832",
           "4833",
+          "4835",
           "4843",
           "4845",
           "4846"
         ],
-        "count": 49,
-        "pct": 46,
+        "count": 56,
+        "pct": 53,
         "quotes": [
           {
             "participant_id": "4444",
             "quote": "It's very important because I need to be safe. About safety"
           },
           {
-            "participant_id": "4446",
-            "quote": "Yes I can access the VPN from anywhere and it will be available on the any devices. So I can finish my work as soon as possible Benefits about VPN Access and Privacy Protection for the Public Domain Users via Privacy to the extent that they can access it without having access to the data"
+            "participant_id": "4450",
+            "quote": "Sounds good Yes. I usually only use at home for safety."
           },
           {
             "participant_id": "4453",
@@ -256,91 +262,36 @@
         ]
       },
       {
-        "title": "Limited Personal Relevance Despite Acknowledged Benefits",
-        "description": "Convenience outweighs necessity for this segment, as participants recognize potential value but see no immediate personal application. Nearly half express uncertainty about how the feature works or how it differs from standard VPN functionality. Technical complexity and lack of understanding prevent adoption, with several noting they would need more education before considering use. Cost concerns and questions about additional fees appear alongside general indifference. This segment represents an opportunity for simplified messaging and clearer use-case demonstrations to convert passive interest into active adoption.",
-        "participant_ids": [
-          "4449",
-          "4450",
-          "4451",
-          "4459",
-          "4466",
-          "4468",
-          "4470",
-          "4471",
-          "4473",
-          "4475",
-          "4483",
-          "4490",
-          "4491",
-          "4516",
-          "4519",
-          "4520",
-          "4524",
-          "4543",
-          "4555",
-          "4561",
-          "4570",
-          "4573",
-          "4711",
-          "4724",
-          "4732",
-          "4741",
-          "4742",
-          "4746",
-          "4763",
-          "4775",
-          "4804",
-          "4807",
-          "4808",
-          "4811",
-          "4813",
-          "4814",
-          "4818",
-          "4835",
-          "4840"
-        ],
-        "count": 39,
-        "pct": 37,
-        "quotes": [
-          {
-            "participant_id": "4449",
-            "quote": "Slightly important for accessibility Open to more hackers"
-          },
-          {
-            "participant_id": "4450",
-            "quote": "Sounds good Yes. I usually only use at home for safety."
-          },
-          {
-            "participant_id": "4451",
-            "quote": "Not sure. I don\u2019t know much about it. What are the benefits. Not much for me. If I was doing something shady maybe."
-          }
-        ]
-      },
-      {
-        "title": "Feature Rejected as Unnecessary or Counterproductive",
-        "description": "Strong resistance appears toward private server locations, with participants viewing the feature as a gimmick or security liability. Concerns about traceability and maintenance requirements outweigh perceived benefits by a ratio of 2:1 in this segment. Several participants prefer servers in different countries specifically to maximize anonymity, making personal locations counterintuitive to their VPN usage goals. Skepticism about VPN reliability and fears of identity exposure through predictable location patterns reinforce rejection. This segment prioritizes simplicity and traditional VPN functionality, suggesting marketing should avoid emphasizing this feature to avoid alienating privacy purists.",
+        "title": "Minimalist Users See Limited Personal Need",
+        "description": "Convenience outweighs advanced features for this segment, with home-only usage patterns dominating their VPN requirements. Approximately half view private server locations as unnecessary complexity or \"gimmicks\" that don't align with their basic security needs. Cost sensitivity limits interest in premium features, as participants prioritize simple, affordable protection over customization options. This segment represents price-conscious customers seeking streamlined VPN services without advanced configuration capabilities.",
         "participant_ids": [
           "4434",
           "4435",
+          "4449",
+          "4459",
+          "4473",
+          "4483",
           "4484",
+          "4490",
           "4505",
+          "4524",
           "4525",
           "4528",
-          "4532",
           "4535",
           "4547",
-          "4549",
-          "4725",
+          "4570",
           "4728",
-          "4750",
-          "4754",
+          "4742",
           "4756",
           "4760",
+          "4763",
           "4765",
-          "4825"
+          "4775",
+          "4804",
+          "4829"
         ],
-        "count": 18,
-        "pct": 17,
+        "count": 24,
+        "pct": 23,
         "quotes": [
           {
             "participant_id": "4434",
@@ -351,126 +302,140 @@
             "quote": "Not very. To me, that is a gimmick. Maybe nice for a gamer, but that is not what I use it for. Drawback is that everyone has to have the same VPN provider."
           },
           {
-            "participant_id": "4484",
-            "quote": "I don\u2019t this would appeal to me. It\u2019s still tied back to a location"
+            "participant_id": "4449",
+            "quote": "Slightly important for accessibility Open to more hackers"
+          }
+        ]
+      },
+      {
+        "title": "Uncertain Users Lack Understanding of Feature Value",
+        "description": "Technical complexity prevents adoption for this segment, with participants expressing confusion about private server functionality and practical applications. Knowledge gaps outnumber enthusiasm by a significant margin, as most participants admit unfamiliarity with VPN capabilities beyond basic security. Nearly all cite uncertainty about benefits versus drawbacks, with several explicitly stating they don't understand the feature or see personal relevance. Educational content and simplified explanations could convert this segment into active users.",
+        "participant_ids": [
+          "4451",
+          "4466",
+          "4471",
+          "4475",
+          "4491",
+          "4516",
+          "4519",
+          "4520",
+          "4532",
+          "4549",
+          "4555",
+          "4561",
+          "4573",
+          "4711",
+          "4725",
+          "4741",
+          "4746",
+          "4807",
+          "4808",
+          "4811",
+          "4814",
+          "4818",
+          "4840"
+        ],
+        "count": 23,
+        "pct": 22,
+        "quotes": [
+          {
+            "participant_id": "4451",
+            "quote": "Not sure. I don\u2019t know much about it. What are the benefits. Not much for me. If I was doing something shady maybe."
+          },
+          {
+            "participant_id": "4466",
+            "quote": "I've never used this particular service within a VPN. I think it might be useful to some, but not sure how useful it is for me. I'm not very well versed in VPN's other than knowing a bit about what and how they protect. I think using this might make one's data and privacy even more secure."
+          },
+          {
+            "participant_id": "4471",
+            "quote": "I'm not sure because I have never done this myself. I don't think I personally need this capability. It could be a security risk if information is somehow compromised in any way."
           }
         ]
       }
     ]
   },
   "unmet_needs_always_avail": {
-    "question": "Would you be interested in a VPN that better meets your needs?",
+    "question": "What problems have you experienced with your current VPN?",
     "n_participants": 106,
-    "headline": "Most participants open to a better-fit VPN option",
-    "summary": "43% of participants are satisfied yet willing to explore a better-fit VPN, 30% are loyal and unlikely to switch, and 24% are frustrated by blocks and technical limitations. Prioritize a premium, reliability-focused offer that targets the open-to-switch 43% while explicitly solving the 24%\u2019s pain points with stronger unblocking and performance guarantees.",
+    "headline": "Most Participants Satisfied Though Quarter Face Performance and Access Issues",
+    "summary": "While 65% of participants report no current VPN issues, 25% experience performance and technical reliability problems, and 8% encounter site blocking and access restrictions. Prioritize addressing performance concerns for the quarter of participants experiencing technical difficulties to improve overall satisfaction.",
     "themes": [
       {
-        "title": "Satisfied Users Open to Exploring Alternatives",
-        "description": "Strong interest exists among participants who report no current issues but remain curious about new options. Most express willingness to research, trial, or learn more about alternative VPN services despite satisfaction with their current provider. Price and value comparison emerge as the primary decision factors, with cost sensitivity outweighing brand loyalty. This segment represents potential switchers who could be converted through competitive pricing and clear feature differentiation.",
+        "title": "Satisfied Users with No Current Issues",
+        "description": "No significant problems emerge among this segment, with reliability and accessibility consistently meeting expectations. Most participants report smooth performance and express contentment with their existing VPN service. Openness to new offerings ranks lower than loyalty to current providers, as nearly all cite satisfaction as their reason for staying. Cost and bundling options would need to be compelling to motivate switching behavior in this stable, low-urgency segment.",
         "participant_ids": [
-          "4444",
+          "4434",
+          "4446",
+          "4451",
           "4453",
           "4457",
+          "4459",
+          "4460",
+          "4461",
           "4466",
-          "4467",
-          "4468",
+          "4471",
           "4473",
-          "4479",
+          "4475",
+          "4480",
           "4481",
+          "4483",
           "4484",
           "4485",
           "4489",
-          "4490",
           "4496",
           "4505",
-          "4513",
+          "4510",
           "4514",
           "4516",
+          "4519",
           "4520",
           "4524",
           "4525",
           "4528",
           "4531",
           "4532",
+          "4543",
           "4547",
+          "4549",
           "4550",
-          "4553",
           "4559",
           "4561",
           "4566",
+          "4570",
           "4573",
           "4711",
-          "4725",
+          "4724",
           "4732",
           "4739",
+          "4746",
+          "4750",
           "4751",
+          "4754",
+          "4756",
+          "4760",
+          "4765",
           "4775",
+          "4790",
+          "4801",
           "4807",
+          "4810",
           "4814",
           "4818",
           "4820",
           "4824",
           "4826",
           "4829",
-          "4832",
-          "4840"
-        ],
-        "count": 46,
-        "pct": 43,
-        "quotes": [
-          {
-            "participant_id": "4444",
-            "quote": "It did helped me. I would probably be interested."
-          },
-          {
-            "participant_id": "4453",
-            "quote": "Not really it has been working very well. I would be interested in learning what more it offers from the vpn I have now. Exactly how much performance?"
-          },
-          {
-            "participant_id": "4457",
-            "quote": "I never had a problem I would want to know what the price is"
-          }
-        ]
-      },
-      {
-        "title": "Loyal and Unlikely to Switch Providers",
-        "description": "Resistance to change characterizes this segment, with participants expressing contentment or indifference toward new VPN options. Loyalty to current providers outweighs curiosity about alternatives by a significant margin. Several indicate they would only consider switching if bundled with existing security services or if their current solution failed. Minimal engagement with the concept of improvement suggests low acquisition potential without a compelling disruption to their current experience. Marketing efforts toward this group would likely yield poor return on investment.",
-        "participant_ids": [
-          "4434",
-          "4446",
-          "4451",
-          "4459",
-          "4460",
-          "4461",
-          "4471",
-          "4475",
-          "4480",
-          "4483",
-          "4510",
-          "4519",
-          "4549",
-          "4570",
-          "4746",
-          "4754",
-          "4760",
-          "4765",
-          "4790",
-          "4801",
-          "4805",
-          "4809",
-          "4810",
-          "4813",
-          "4816",
-          "4825",
           "4830",
+          "4832",
           "4833",
           "4835",
+          "4840",
           "4843",
           "4845",
           "4846"
         ],
-        "count": 32,
-        "pct": 30,
+        "count": 69,
+        "pct": 65,
         "quotes": [
           {
             "participant_id": "4434",
@@ -487,67 +452,102 @@
         ]
       },
       {
-        "title": "Frustrated by Blocks and Technical Limitations",
-        "description": "Site blocking and connection issues rank as the top pain points driving interest in alternatives. Participants report being blocked from Reddit, surveys, retail sites, and other platforms while using their current VPN. Speed degradation and dropped connections frustrate this segment nearly as much as access restrictions. Enthusiasm for a better solution runs high, with expressions like \"would love it\" and \"would be awesome\" appearing frequently. This represents a high-intent audience ready to switch immediately if reliability and accessibility improve.",
+        "title": "Performance and Technical Reliability Issues",
+        "description": "Speed degradation and connection stability emerge as the primary technical frustrations, with slowness compared to raw connections ranking as the most frequent complaint. Disconnection problems outnumber other technical issues roughly 2:1, including app compatibility challenges and registration delays. Nearly half of this segment mentions network drops, reboots, or intermittent failures that disrupt their workflow. This performance-sensitive group would respond to guarantees of faster speeds and stable connections, representing an opportunity to differentiate on technical excellence.",
         "participant_ids": [
-          "4435",
+          "4444",
           "4449",
-          "4450",
-          "4458",
-          "4470",
-          "4477",
-          "4535",
-          "4543",
-          "4555",
+          "4468",
+          "4479",
+          "4490",
+          "4491",
+          "4513",
           "4709",
-          "4724",
+          "4725",
           "4728",
           "4735",
           "4736",
-          "4741",
           "4742",
           "4748",
           "4749",
           "4763",
           "4781",
           "4804",
+          "4805",
           "4808",
+          "4809",
           "4811",
           "4812",
-          "4822"
+          "4813",
+          "4816",
+          "4822",
+          "4825"
         ],
-        "count": 25,
-        "pct": 24,
+        "count": 27,
+        "pct": 25,
         "quotes": [
           {
-            "participant_id": "4435",
-            "quote": "Reddit has begun blocking you if you use a VPN. I would love it"
+            "participant_id": "4444",
+            "quote": "It did helped me. I would probably be interested."
           },
           {
             "participant_id": "4449",
             "quote": "When adjustments made still not totally secure Contact my company through internet"
           },
           {
+            "participant_id": "4468",
+            "quote": "It can be slow at times I might be inclined to trial it"
+          }
+        ]
+      },
+      {
+        "title": "Site Blocking and Access Restrictions",
+        "description": "Website accessibility issues dominate complaints in this segment, with VPN detection blocking participants from Reddit, market research surveys, Home Depot, and other desired destinations. Access restrictions outweigh performance concerns as the primary pain point. Strong enthusiasm exists for solutions that promise unblocked access, with participants specifically mentioning frustration when legitimate activities get prevented. This represents an underserved segment where improved bypass technology could capture dissatisfied users from competitors.",
+        "participant_ids": [
+          "4435",
+          "4450",
+          "4458",
+          "4470",
+          "4477",
+          "4535",
+          "4555",
+          "4741"
+        ],
+        "count": 8,
+        "pct": 8,
+        "quotes": [
+          {
+            "participant_id": "4435",
+            "quote": "Reddit has begun blocking you if you use a VPN. I would love it"
+          },
+          {
             "participant_id": "4450",
             "quote": "It blocked me from a site that I wanted once That would be good"
+          },
+          {
+            "participant_id": "4458",
+            "quote": "Sometimes the websites I'm using, like market research surveys, won't allow me to complete surveys if I'm on a VPN. It would be great!"
           }
         ]
       }
     ]
   },
   "current_vpn_feedback": {
-    "question": "Is there anything you wish your VPN offered?",
+    "question": "What features do you wish your VPN had?",
     "n_participants": 88,
-    "headline": "Most participants feel current VPNs already meet their needs",
-    "summary": "69% of participants are satisfied with current VPN capabilities, while 18% want stronger security and better mobile experiences and 12% call for faster performance and broader server coverage. Providers should prioritize advanced security features and a more seamless mobile experience to protect satisfaction and unlock further growth.",
+    "headline": "Most Participants Satisfied While Minority Seeks Performance Improvements",
+    "summary": "The majority of participants (84%) require no additional VPN features, while 11% desire performance enhancements including speed and server expansion, and 5% seek mobile and cross-device usability improvements. Focus development resources on optimizing speed and expanding server infrastructure to address the performance-focused segment while maintaining current feature stability for satisfied participants.",
     "themes": [
       {
-        "title": "Satisfied With Current VPN Capabilities",
-        "description": "Strong contentment exists among the majority of participants, with no additional features requested. Most express complete satisfaction through responses like 'it offers all features' and 'have everything I need.' This segment demonstrates low churn risk and represents a stable customer base. Retention efforts should focus on maintaining current service quality rather than feature expansion.",
+        "title": "Satisfied Non-Demanders: No Additional Features Needed",
+        "description": "Nearly all participants in this segment explicitly state satisfaction with current capabilities, representing the largest group at 67% of total responses. These participants use phrases like \"meets my expectations,\" \"has all features,\" and \"everything I need,\" indicating feature completeness rather than feature gaps. No specific requests emerge from this group beyond general mentions of continued security improvements and service upgrades. This satisfied majority suggests the VPN market may be reaching feature maturity, with retention strategies and reliability becoming more critical than new capability development for this substantial user base.",
         "participant_ids": [
           "4444",
+          "4446",
+          "4449",
           "4451",
           "4457",
+          "4460",
           "4461",
           "4466",
           "4467",
@@ -557,12 +557,16 @@
           "4475",
           "4477",
           "4480",
+          "4481",
           "4484",
           "4485",
           "4489",
+          "4490",
+          "4491",
           "4496",
           "4505",
           "4510",
+          "4513",
           "4516",
           "4520",
           "4524",
@@ -575,9 +579,14 @@
           "4555",
           "4559",
           "4566",
+          "4570",
           "4573",
+          "4709",
+          "4711",
+          "4724",
           "4725",
           "4732",
+          "4736",
           "4739",
           "4741",
           "4742",
@@ -586,89 +595,51 @@
           "4751",
           "4763",
           "4765",
+          "4775",
           "4790",
           "4801",
           "4810",
+          "4811",
           "4813",
           "4816",
           "4818",
           "4822",
           "4824",
+          "4825",
           "4826",
           "4829",
           "4830",
+          "4832",
           "4835",
           "4840",
           "4843",
           "4845",
           "4846",
-          "4446",
-          "4460",
-          "4490",
-          "4570"
+          "4458"
         ],
-        "count": 61,
-        "pct": 69,
+        "count": 74,
+        "pct": 84,
         "quotes": [
           {
             "participant_id": "4444",
             "quote": "No,not at all"
           },
           {
-            "participant_id": "4451",
-            "quote": "None that I know of."
+            "participant_id": "4446",
+            "quote": "Not sure"
           },
-          {
-            "participant_id": "4457",
-            "quote": "no there isn't"
-          }
-        ]
-      },
-      {
-        "title": "Enhanced Security and Mobile Experience Needs",
-        "description": "Security enhancements and seamless mobile functionality emerge as interconnected priorities for this segment. Participants request features like breach notifications, stronger hacking protection, and the ability to use VPN 'seamlessly on my phone.' Mobile usability concerns appear alongside requests for personal account representatives and bundled cybersecurity features. Nearly all in this group express willingness to explore additional capabilities, suggesting openness to premium tier offerings that combine robust security with cross-device convenience.",
-        "participant_ids": [
-          "4449",
-          "4481",
-          "4491",
-          "4513",
-          "4535",
-          "4709",
-          "4711",
-          "4724",
-          "4735",
-          "4736",
-          "4775",
-          "4809",
-          "4811",
-          "4814",
-          "4825",
-          "4832"
-        ],
-        "count": 16,
-        "pct": 18,
-        "quotes": [
           {
             "participant_id": "4449",
             "quote": "Just more secure"
-          },
-          {
-            "participant_id": "4481",
-            "quote": "I think it is positive and affordable at this way, maybe I could try another features to improve performance."
-          },
-          {
-            "participant_id": "4491",
-            "quote": "I wish they. Kind of assigned you a personal rep.So that you can develop some sort of relationship with them"
           }
         ]
       },
       {
-        "title": "Performance and Server Expansion Demands",
-        "description": "Speed and server availability rank as the primary improvement requests, outweighing all other feature demands roughly 3:1. Participants specifically mention 'higher speeds,' 'more bandwidth,' and 'more options in terms of countries.' Reliable multi-location access with fast connections emerges as a key differentiator, with one participant noting the need for 'options that are equally viable.' Investing in infrastructure expansion could capture this performance-focused segment willing to pay for premium speed.",
+        "title": "Performance Enhancement: Speed and Server Expansion",
+        "description": "Speed and server performance emerge as the primary technical concerns, with connection speed mentioned twice as often as server availability issues. Participants specifically request faster connections, reduced server response times, and expanded geographic server options to provide more viable location choices. Server expansion ranks second among all feature requests, with multiple participants citing limited country availability as a key limitation. Organizations should prioritize infrastructure investment in high-speed servers and geographic expansion to address the most frequently cited technical gaps.",
         "participant_ids": [
           "4450",
           "4453",
-          "4458",
           "4473",
           "4479",
           "4528",
@@ -678,8 +649,8 @@
           "4808",
           "4812"
         ],
-        "count": 11,
-        "pct": 12,
+        "count": 10,
+        "pct": 11,
         "quotes": [
           {
             "participant_id": "4450",
@@ -690,55 +661,83 @@
             "quote": "I wish it offered more options in terms of countries I could connect to."
           },
           {
-            "participant_id": "4458",
-            "quote": "Working for every website without limitation."
+            "participant_id": "4473",
+            "quote": "speed!"
+          }
+        ]
+      },
+      {
+        "title": "Mobile and Cross-Device Usability Improvements",
+        "description": "Mobile functionality concerns outnumber desktop issues significantly, with participants describing phone-based VPN usage as \"cumbersome\" and lacking seamless integration. The desire for VPNs that \"travel with me on my phone everywhere I go\" reflects strong demand for improved mobile experiences. Ease of use across multiple devices ranks as a distinct pain point, with several participants requesting more robust features on non-primary devices. This segment represents mobile-first users whose adoption and retention depend on simplified cross-platform functionality rather than advanced technical features.",
+        "participant_ids": [
+          "4535",
+          "4735",
+          "4809",
+          "4814"
+        ],
+        "count": 4,
+        "pct": 5,
+        "quotes": [
+          {
+            "participant_id": "4535",
+            "quote": "VPN for me to use on my phone."
+          },
+          {
+            "participant_id": "4735",
+            "quote": "The ability to use it seamlessly on my phone. it is pretty cumbersome t use on my phone currently."
+          },
+          {
+            "participant_id": "4809",
+            "quote": "More robust and easy to use features on other devices"
           }
         ]
       }
     ]
   },
   "remove_data_steps_probe_yes": {
-    "question": "How satisfied were you with removing your personal data online?",
+    "question": "Why did you remove your personal data from online sites?",
     "n_participants": 60,
-    "headline": "Confidence In Data Removal Remains Fragile",
-    "summary": "While 47% of participants are satisfied with their privacy and security outcomes, 43% are uncertain whether their data is truly removed and 8% are driven by fear but lack clear solutions. Organizations should provide simple, guided data-removal workflows and transparent confirmation of deletion to convert uncertainty and fear into confidence.",
+    "headline": "Participants Remove Personal Data to Reclaim Privacy and Control",
+    "summary": "Participants removed personal data from online sites primarily to control their privacy and reduce digital footprints (43%), followed by efforts to mitigate tracking and spam (37%), and to protect against security threats (20%). Organizations should provide transparent, accessible tools that empower participants to manage their online presence and data visibility across platforms.",
     "themes": [
       {
-        "title": "Satisfied with Privacy and Security Outcomes",
-        "description": "Strong satisfaction exists among participants who successfully removed personal data, with security concerns like fraud, hacking, and identity theft driving their actions. Most in this group report feeling relieved, pleased, or very satisfied after taking steps such as locking social media, using data cleansing services, or monitoring their digital footprint. Privacy protection outweighs convenience concerns 3:1 for these participants, who specifically mention credit card security, spam reduction, and anonymity as key benefits. This segment represents engaged privacy advocates who could become champions for data protection tools and premium security services.",
+        "title": "Privacy Control and Digital Footprint Reduction",
+        "description": "Proactive privacy management emerges as the dominant motivation, with participants seeking to minimize public information availability rather than responding to specific incidents. Strong preference exists for limiting personal exposure, with anonymity and reduced digital presence mentioned more frequently than security threats. Nearly all participants express satisfaction with their actions, though technical complexity and uncertainty about effectiveness create ongoing concerns. This represents privacy-conscious individuals who value control and would engage with transparency-focused data management platforms.",
         "participant_ids": [
+          "4434",
           "4444",
           "4450",
-          "4459",
-          "4460",
-          "4467",
-          "4470",
+          "4453",
+          "4468",
           "4471",
+          "4473",
           "4475",
+          "4477",
+          "4479",
           "4481",
           "4483",
-          "4510",
-          "4514",
-          "4528",
-          "4547",
+          "4543",
           "4550",
+          "4553",
           "4724",
-          "4732",
+          "4728",
           "4746",
           "4748",
+          "4756",
           "4763",
           "4775",
           "4804",
           "4805",
-          "4807",
-          "4810",
-          "4820",
-          "4825",
+          "4840",
           "4843"
         ],
-        "count": 28,
-        "pct": 47,
+        "count": 26,
+        "pct": 43,
         "quotes": [
+          {
+            "participant_id": "4434",
+            "quote": "do not leave data all over the place OK"
+          },
           {
             "participant_id": "4444",
             "quote": "Because I don't want nobody knowing my identity. I felt relieved doing that."
@@ -746,6 +745,46 @@
           {
             "participant_id": "4450",
             "quote": "I locked my Facebook page Yes. It is friends only"
+          }
+        ]
+      },
+      {
+        "title": "Tracking and Spam Mitigation Efforts",
+        "description": "Unwanted digital intrusions drive removal behavior, with spam, tracking cookies, and unauthorized data sharing ranking as top frustrations. Technical actions like cache clearing, cookie blocking, and third-party refusal appear frequently, though satisfaction levels remain mixed due to persistent recurrence issues. The ratio of participants reporting temporary versus permanent relief stands at roughly 3:1, indicating ongoing effectiveness challenges. This segment needs automated tools that continuously monitor and block unwanted data collection rather than one-time removal services.",
+        "participant_ids": [
+          "4451",
+          "4457",
+          "4459",
+          "4460",
+          "4467",
+          "4470",
+          "4480",
+          "4510",
+          "4520",
+          "4524",
+          "4528",
+          "4535",
+          "4549",
+          "4555",
+          "4711",
+          "4808",
+          "4809",
+          "4812",
+          "4813",
+          "4814",
+          "4825",
+          "4832"
+        ],
+        "count": 22,
+        "pct": 37,
+        "quotes": [
+          {
+            "participant_id": "4451",
+            "quote": "I have done manually to ensure credit cards are not stored and passwords are different y. No. It\u2019s cumbersome."
+          },
+          {
+            "participant_id": "4457",
+            "quote": "I knew the sites I visited were being tracked and cookies put on my computer It worked somewhat. It does happen again, though."
           },
           {
             "participant_id": "4459",
@@ -754,38 +793,24 @@
         ]
       },
       {
-        "title": "Uncertain About Data Removal Effectiveness",
-        "description": "Significant skepticism persists among participants who attempted data removal but remain unsure whether their information was truly deleted. Technical complexity and lack of transparency rank as primary frustrations, with participants noting data reappears on the same sites within days or questioning how 'deleted' information really is. Nearly half of this group expresses mixed feelings, using phrases like 'yes and no,' 'hit or miss,' or 'not sure about the process.' Concerns about ongoing tracking, cookies, and persistent digital footprints dominate feedback. This uncertainty signals a critical need for clearer confirmation mechanisms and educational resources about data removal verification.",
+        "title": "Security Threats Drive Protective Action",
+        "description": "Direct security incidents motivate data removal, with fraud and hacking ranking as primary triggers. Identity theft, credit card misuse, and account breaches appear consistently across participant accounts, with financial security concerns outnumbering general privacy worries 2:1. Most participants report moderate satisfaction with removal outcomes, though significant uncertainty exists about whether data truly disappears. This segment requires reassurance through verification tools and breach monitoring services.",
         "participant_ids": [
           "4435",
           "4449",
-          "4451",
-          "4453",
-          "4457",
-          "4468",
-          "4473",
-          "4477",
-          "4479",
           "4484",
-          "4520",
-          "4524",
+          "4514",
           "4531",
-          "4535",
-          "4543",
-          "4553",
-          "4555",
-          "4711",
-          "4728",
+          "4547",
+          "4566",
+          "4732",
           "4749",
-          "4756",
-          "4809",
-          "4812",
-          "4814",
-          "4832",
-          "4840"
+          "4807",
+          "4810",
+          "4820"
         ],
-        "count": 26,
-        "pct": 43,
+        "count": 12,
+        "pct": 20,
         "quotes": [
           {
             "participant_id": "4435",
@@ -796,54 +821,26 @@
             "quote": "Being hacked Just ok still not totally secure"
           },
           {
-            "participant_id": "4451",
-            "quote": "I have done manually to ensure credit cards are not stored and passwords are different y. No. It\u2019s cumbersome."
-          }
-        ]
-      },
-      {
-        "title": "Motivated by Fear but Lacking Clear Solutions",
-        "description": "Fear of data breaches, hacking, and identity exposure drives this group, yet participants struggle to articulate satisfaction levels or describe concrete outcomes. Anxiety about cybersecurity incidents at other companies and the ease with which personal data can be accessed emerges as the dominant theme. Emotional responses outweigh practical assessments 2:1, with participants describing the digital landscape as 'scary' and expressing nebulous fears about unknown vulnerabilities. Several mention credit card theft, doxxing concerns, or false credit reports as triggering events without clear resolution. This segment requires reassurance-focused messaging and simplified, guided data protection workflows to convert concern into confident action.",
-        "participant_ids": [
-          "4434",
-          "4480",
-          "4566",
-          "4808",
-          "4813"
-        ],
-        "count": 5,
-        "pct": 8,
-        "quotes": [
-          {
-            "participant_id": "4434",
-            "quote": "do not leave data all over the place OK"
-          },
-          {
-            "participant_id": "4480",
-            "quote": "i want to let of shows on on tv as far as netflix and stuff like that with data breaches and all kinds of stuff so i mean it's a it's a pretty scary world that we're living in and the best protection is keep the vpn in place so that secure my my granddaughter secure and the rest of my family is secure because i mean god forbid if anything should happened with and unsecured computer system i was pretty satisfied i i take off everything if i'm not using it just to protect us i said i'm that's one of my major concerns so i i take the time out to do it and it doesn't really bother me as long as i feel safe and secure"
-          },
-          {
-            "participant_id": "4566",
-            "quote": "My credit card was stolen but in my wallet The thieves used the number on my card but my card was in my wallet I had just gotten off the credit card site after paying my monthly bill then not 10 minutes later someone stole the number and used it to try to buy 500 dollars sneakers Very satisfied"
+            "participant_id": "4484",
+            "quote": "Being hacked I still felt that the information was still out there."
           }
         ]
       }
     ]
   },
   "remove_data_steps_probe_no": {
-    "question": "Would you consider removing your personal information from data broker sites?",
+    "question": "Would you be interested in removing your personal information from online databases?",
     "n_participants": 30,
-    "headline": "Participants Split On Removing Data From Broker Sites",
-    "summary": "40% of participants are disengaged or firmly opposed to removal, 37% express clear intent to remove their data, and 23% are interested but blocked by practical barriers. Prioritize a streamlined, guided removal solution that directly addresses the most common logistical obstacles.",
+    "headline": "Participants Split on Personal Data Removal from Online Databases",
+    "summary": "When asked about removing personal information from online databases, participants were nearly evenly divided: 37% were disinterested or opposed, 33% showed interest but cited cost and complexity barriers, and 30% expressed definite interest. Organizations should consider offering tiered data removal services that address cost concerns and simplify the process for the two-thirds of participants showing some level of interest.",
     "themes": [
       {
-        "title": "Disengaged or Firmly Opposed to Removal",
-        "description": "Significant resistance appears toward data removal services, ranging from mild disinterest to absolute refusal. Privacy paradoxes emerge here, with one participant unwilling to share information even to protect their information. The majority express flat disinterest without elaboration, while others remain undecided with low engagement signals. This segment likely requires substantial education on data broker risks before any conversion potential exists.",
+        "title": "Disinterested or Actively Opposed",
+        "description": "Resistance to data removal services dominates this segment, with approximately one-third of all participants showing no interest. Privacy concerns paradoxically prevent engagement, as participants fear providing additional personal information to removal services. The majority offer no qualifying conditions or future consideration, using definitive language like 'never' and 'absolutely neither.' This segment requires fundamental education about service mechanics and trust-building before any conversion becomes viable.",
         "participant_ids": [
           "4458",
           "4461",
           "4490",
-          "4496",
           "4513",
           "4750",
           "4760",
@@ -853,8 +850,8 @@
           "4801",
           "4846"
         ],
-        "count": 12,
-        "pct": 40,
+        "count": 11,
+        "pct": 37,
         "quotes": [
           {
             "participant_id": "4458",
@@ -871,52 +868,22 @@
         ]
       },
       {
-        "title": "Clear Intent to Remove Personal Data",
-        "description": "Definitive willingness to act characterizes this group, with security concerns outweighing convenience factors 2:1. Hacking risks and personal data protection rank as primary motivators for action. Most participants express unconditional interest without mentioning cost or process barriers. This high-intent segment represents ready adopters who would likely convert quickly with minimal friction in the signup process.",
-        "participant_ids": [
-          "4516",
-          "4573",
-          "4735",
-          "4739",
-          "4741",
-          "4811",
-          "4822",
-          "4824",
-          "4826",
-          "4829",
-          "4830"
-        ],
-        "count": 11,
-        "pct": 37,
-        "quotes": [
-          {
-            "participant_id": "4516",
-            "quote": "I will certainly consider this because because people hacking information online is common place"
-          },
-          {
-            "participant_id": "4573",
-            "quote": "I would be interested"
-          },
-          {
-            "participant_id": "4735",
-            "quote": "Yes, it will be beneficial."
-          }
-        ]
-      },
-      {
-        "title": "Interested but Blocked by Practical Barriers",
-        "description": "Strong interest exists in removing personal information, yet cost and complexity create significant hesitation. Participants cite concerns about pricing, required steps, and uncertainty about the process itself. Knowledge gaps emerge as a key barrier, with several explicitly stating they don't know how to proceed. This segment represents a conversion opportunity through clear pricing transparency and simplified onboarding guides.",
+        "title": "Interested but Cost and Complexity Constrained",
+        "description": "Cost sensitivity and technical barriers emerge as the primary obstacles preventing action, with convenience concerns ranking equally important. Nearly half of all participants express conditional interest contingent on pricing transparency and simplified processes. Specific concerns include unclear removal procedures, fear of disrupting existing online community participation, and uncertainty about required steps. This segment represents a high-conversion opportunity if solutions address affordability and provide guided implementation support.",
         "participant_ids": [
           "4466",
           "4491",
+          "4496",
           "4505",
           "4519",
           "4559",
           "4561",
-          "4816"
+          "4816",
+          "4822",
+          "4826"
         ],
-        "count": 7,
-        "pct": 23,
+        "count": 10,
+        "pct": 33,
         "quotes": [
           {
             "participant_id": "4466",
@@ -929,6 +896,37 @@
           {
             "participant_id": "4505",
             "quote": "it depends on the costs and convenience"
+          }
+        ]
+      },
+      {
+        "title": "Definite Interest in Data Removal",
+        "description": "Strong commitment to removing personal information characterizes this segment, with security concerns outweighing convenience factors. Participants explicitly cite hacking risks and perceived benefits as primary motivators, demonstrating awareness of digital privacy threats. Most express unconditional willingness to proceed without mentioning cost or complexity barriers. This group represents immediate conversion potential and likely values privacy as a premium service worth investing in without extensive justification.",
+        "participant_ids": [
+          "4516",
+          "4573",
+          "4735",
+          "4739",
+          "4741",
+          "4811",
+          "4824",
+          "4829",
+          "4830"
+        ],
+        "count": 9,
+        "pct": 30,
+        "quotes": [
+          {
+            "participant_id": "4516",
+            "quote": "I will certainly consider this because because people hacking information online is common place"
+          },
+          {
+            "participant_id": "4573",
+            "quote": "I would be interested"
+          },
+          {
+            "participant_id": "4735",
+            "quote": "Yes, it will be beneficial."
           }
         ]
       }
