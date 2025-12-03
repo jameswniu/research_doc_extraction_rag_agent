@@ -89,7 +89,7 @@ flowchart TB
 - Reads any Excel file with survey responses
 - Auto-detects which columns are questions
 - Infers the actual question text from responses (not just column names)
-- Groups responses into 3 themes per question
+- Groups responses into 3-5 themes per question (based on natural clustering)
 - Picks representative quotes without duplicates
 - Writes executive summaries
 - Outputs JSON and Markdown
@@ -101,10 +101,11 @@ flowchart TB
 | Dual Model | Claude Opus 4.5 for extraction, GPT-5.1 for summaries |
 | Question Inference | Figures out what was asked by looking at responses |
 | Dynamic Columns | Extracts question columns automatically from your Excel |
+| Variable Themes | 3-5 themes based on natural clustering in the data |
+| Senior Research Tone | Authoritative, $500/hour consultant voice |
 | Varied Metrics | Uses ratios, rankings, comparisons (not just percentages) |
 | Varied Openings | Sentences start differently, not always "Participants..." |
 | Unique Quotes | No quote appears twice across themes |
-| Deterministic | Temperature=0 for reproducible results |
 
 ## Setup
 
@@ -165,14 +166,14 @@ usercue-thematic-analysis/
 ```json
 {
   "column_name": {
-    "question": "What are your thoughts on column name?",
+    "question": "What factors influenced your decision when choosing your VPN?",
     "n_participants": 105,
-    "headline": "Key insight under 12 words",
-    "summary": "Two sentences with theme percentages",
+    "headline": "Key insight under 8 words",
+    "summary": "1-2 sentences with actionable recommendation",
     "themes": [
       {
         "title": "Theme title",
-        "description": "4-5 sentences with varied metrics",
+        "description": "3-4 sentences. Senior researcher voice.",
         "pct": 38,
         "quotes": [
           {"participant_id": "4434", "quote": "What they said"}
@@ -185,11 +186,13 @@ usercue-thematic-analysis/
 
 ## Configuration
 
-| Setting | Value |
-|---------|-------|
-| Model | claude-sonnet-4-5-20250929 |
-| Temperature | 0 |
-| Max Tokens | 4096 |
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| Claude Model | claude-opus-4-5-20251101 | Theme extraction |
+| GPT Model | gpt-5.1 | Summary generation |
+| Extraction Temp | 0.1 | Near-deterministic themes |
+| Summary Temp | 0.5 | Natural language variation |
+| Inference Temp | 0.3 | Natural question phrasing |
 
 ## Example Output
 

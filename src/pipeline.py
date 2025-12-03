@@ -25,7 +25,7 @@ openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # Model configuration
 CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Heavy lifting: inference, themes
-OPENAI_MODEL = "gpt-5.1"  # Summaries: warmer, conversational
+OPENAI_MODEL = "gpt-5.1"  # Summaries: authoritative, executive tone
 
 
 def find_question_columns(df):

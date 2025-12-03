@@ -15,7 +15,15 @@ python src/report.py output/results.json output/report.md
 
 The pipeline uses two models:
 - **Claude Opus 4.5** - Question inference and theme extraction (heavy lifting)
-- **GPT-5.1** - Executive summary generation (warmer, conversational)
+- **GPT-5.1** - Executive summary generation (authoritative, senior researcher tone)
+
+## Temperature Settings
+
+| Task | Model | Temp | Rationale |
+|------|-------|------|-----------|
+| Question inference | Claude | 0.3 | Natural phrasing variation |
+| Theme extraction | Claude | 0.1 | Near-deterministic |
+| Summary generation | GPT | 0.5 | Natural language variation |
 
 ## Input Requirements
 
@@ -44,14 +52,14 @@ Gets extracted as: "I really like the privacy features Especially the no-logs po
 ```json
 {
   "column_name": {
-    "question": "What are your thoughts on column name?",
+    "question": "What factors influenced your decision when choosing your VPN?",
     "n_participants": 105,
-    "headline": "Short insight",
-    "summary": "Two sentences about the findings.",
+    "headline": "Short insight (under 8 words)",
+    "summary": "1-2 sentences with actionable recommendation.",
     "themes": [
       {
         "title": "Theme Name",
-        "description": "Description with varied metrics.",
+        "description": "3-4 sentences. Senior researcher voice.",
         "pct": 38,
         "count": 40,
         "participant_ids": ["101", "102"],
@@ -88,7 +96,7 @@ Edit `find_question_columns()` to change:
 
 ### Changing theme count
 
-Edit `make_theme_prompt()` and change "exactly 3 themes" to whatever you need.
+Edit `make_theme_prompt()` - currently produces 3-5 themes based on natural clustering in the data.
 
 ## Troubleshooting
 
