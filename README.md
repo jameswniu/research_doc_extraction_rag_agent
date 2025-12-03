@@ -1,4 +1,4 @@
-# AI-Powered Thematic Analysis Agent
+# AI-Powered Thematic Analysis Pipeline
 
 **Turn messy survey responses into clean research insights-automatically.**
 
