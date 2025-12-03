@@ -1,6 +1,34 @@
 # Thematic Analysis Pipeline
 
-Turns survey responses into organized themes using Claude. Drop in an Excel file, get back grouped insights with supporting quotes.
+**Turn messy survey responses into clean research insights-automatically.**
+
+Drop in an Excel file, get back organized themes with quotes and executive summaries. Uses Claude Opus 4.5 to find patterns and GPT-5.1 to write the summaries.
+
+## Overview
+
+Manual coding takes forever. This pipeline reads your survey responses, figures out what questions were asked, groups similar answers into themes, and picks the best quotes to back them up. What used to take a research team hours now runs in minutes.
+
+What's inside:
+
+- Auto-detects questions from how people responded (not just column names)
+- Finds 3-5 natural themes per question based on semantic clustering
+- Picks quotes that actually support each theme (model selects best matches)
+- No duplicate quotes across themes (tracked globally)
+- Outputs JSON for your tools + Markdown for humans
+
+### Why Two Models?
+
+Claude Opus 4.5 handles the heavy lifting-parsing transcripts, assigning participants to themes, selecting quote IDs. It's precise and follows structured output formats well. GPT-5.1 writes the headlines and summaries with a warmer, more executive tone. Each model does what it's best at.
+
+### Temperature Settings
+
+Different tasks need different creativity levels:
+
+| Task | Model | Temp | Why |
+|------|-------|------|-----|
+| Question inference | Claude | 0.3 | Natural phrasing without hallucination |
+| Theme extraction | Claude | 0.1 | Near-deterministic for accurate IDs |
+| Summary generation | GPT | 0.5 | Varied, natural executive language |
 
 ## How It Works
 
@@ -112,6 +140,7 @@ flowchart TB
 ```bash
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY="your-key"
+export OPENAI_API_KEY="your-key"
 ```
 
 ## Usage

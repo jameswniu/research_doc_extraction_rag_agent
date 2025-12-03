@@ -8,7 +8,7 @@ Questions are extracted dynamically from the Excel columns - no hardcoding.
 
 Models:
 - Claude Opus 4.5: Question inference, theme generation (heavy lifting)
-- GPT-5.1: Summary generation (warmer, more conversational)
+- GPT-5.1: Summary generation (authoritative, executive tone)
 """
 
 import os
@@ -400,7 +400,7 @@ def analyze_one_question(column_name, question_text, data, id_column):
     # Add quotes (no duplicates across themes)
     themes = pick_unique_quotes(themes, response_lookup)
     
-    # Ask GPT-5.1 for the summary (warmer, more conversational)
+    # Ask GPT-5.1 for the summary (authoritative, executive tone)
     summary_prompt = make_summary_prompt(question_text, themes)
     summary_response = ask_gpt(summary_prompt)
     
