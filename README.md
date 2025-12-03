@@ -1,4 +1,4 @@
-# Agentic Insights Extraction for Thematic Analysis
+# Thematic Analysis Agent for Research Insights - Extract Themes. Surface Quotes. Ship Insights.
 
 **Turn messy survey responses into clean research insights-automatically.**
 
