@@ -1,4 +1,4 @@
-# Production Thematic Research Analysis Agent
+# AI-Powered Thematic Analysis Agent
 
 **Turn messy survey responses into clean research insights-automatically.**
 
