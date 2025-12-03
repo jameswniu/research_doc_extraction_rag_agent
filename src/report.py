@@ -23,12 +23,11 @@ def create_report(results, output_file):
     ]
     
     lines = [
-        "# Thematic Analysis Results",
-        "",
-        "VPN/Privacy Market Research",
+        "# Thematic Analysis",
         ""
     ]
     
+    q_num = 0
     for key in question_order:
         result = results.get(key, {})
         
@@ -36,35 +35,35 @@ def create_report(results, output_file):
         if "error" in result or not result:
             continue
         
-        # Add the question section
+        q_num += 1
+        
+        # Question header - numbered
         lines.append("---")
         lines.append("")
-        lines.append(f"## {result['question']}")
-        lines.append("")
-        lines.append(f"**Participants:** {result['n_participants']}")
-        lines.append("")
-        lines.append(f"**Headline:** {result['headline']}")
-        lines.append("")
-        lines.append(f"**Summary:** {result['summary']}")
-        lines.append("")
-        lines.append("### Themes")
+        lines.append(f"## {q_num}. {result['question']}")
+        lines.append(f"*Participants Involved: {result['n_participants']}*")
         lines.append("")
         
-        # Add each theme
+        # Headline - larger (h2)
+        lines.append(f"## {result['headline']}")
+        lines.append("")
+        lines.append(result['summary'])
+        lines.append("")
+        
+        # Themes - no bullets
         for theme in result['themes']:
-            lines.append(f"#### {theme['title']} ({theme['pct']}%)")
+            n_in_theme = len(theme.get('participant_ids', []))
+            lines.append(f"**{theme['title']} ({theme['pct']}%)**")
+            lines.append("")
+            lines.append(f"*Participants Involved: {n_in_theme}*")
             lines.append("")
             lines.append(theme['description'])
             lines.append("")
-            lines.append("**Quotes:**")
-            lines.append("")
             
-            # Add quotes
+            # Quotes - blockquote
             for quote in theme.get('quotes', []):
                 text = quote['quote'].replace('—', '-').replace('–', '-')
-                lines.append(f"> \"{text}\"")
-                lines.append(">")
-                lines.append(f"> - Participant {quote['participant_id']}")
+                lines.append(f"> \"{text}\" - P{quote['participant_id']}")
                 lines.append("")
         
         lines.append("")

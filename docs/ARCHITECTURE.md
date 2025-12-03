@@ -15,7 +15,7 @@ Column Discovery
     - Find question columns (text responses > 20 chars average)
     |
     v
-Question Inference
+Question Inference (Claude Opus 4.5)
     - Sample 5 responses from each column
     - Ask Claude: "What question was asked here?"
     - Get natural, specific question text
@@ -30,7 +30,7 @@ Response Extraction
     - Build participant ID lookup
     |
     v
-Theme Generation (Claude API)
+Theme Generation (Claude Opus 4.5)
     - Send responses with formatting rules
     - Get back 3 themes with participant assignments
     - Parse JSON from response
@@ -41,9 +41,10 @@ Quote Selection
     - Track used quotes to prevent duplicates
     |
     v
-Summary Generation (Claude API)
+Summary Generation (GPT-5.1)
     - Send themes with percentages
     - Get headline + 2-sentence summary
+    - Warmer, more conversational tone
     |
     v
 Post-Processing
@@ -57,7 +58,9 @@ Output (JSON + Markdown)
 
 ## Key Design Decisions
 
-**Question inference** - Instead of guessing from column names like "vpn_selection", the pipeline samples actual responses and asks Claude what question was likely asked. This produces natural, specific questions like "What factors influenced your choice of VPN provider?"
+**Dual model architecture** - Claude Opus 4.5 handles the heavy lifting (question inference, theme extraction) while GPT-5.1 generates the executive summaries. Opus excels at precise extraction from messy data; GPT-5.1 produces warmer, more conversational summaries.
+
+**Question inference** - Instead of guessing from column names like "vpn_selection", the pipeline samples actual responses and asks Claude Opus 4.5 what question was likely asked. This produces natural, specific questions like "What factors influenced your decision when choosing your VPN?"
 
 **Dynamic question detection** - The pipeline doesn't hardcode question names. It looks at column contents and picks out the ones that look like text responses. This makes it work with any survey structure.
 

@@ -5,6 +5,10 @@ Takes survey responses from an Excel file, sends them to Claude,
 and gets back organized themes with quotes and summaries.
 
 Questions are extracted dynamically from the Excel columns - no hardcoding.
+
+Models:
+- Claude Opus 4.5: Question inference, theme generation (heavy lifting)
+- GPT-5.1: Summary generation (warmer, more conversational)
 """
 
 import os
@@ -13,9 +17,15 @@ import sys
 import re
 import pandas as pd
 from anthropic import Anthropic
+from openai import OpenAI
 
-# Set up Claude
+# Set up API clients
 claude = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# Model configuration
+CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Heavy lifting: inference, themes
+OPENAI_MODEL = "gpt-5.1"  # Summaries: warmer, conversational
 
 
 def find_question_columns(df):
@@ -115,7 +125,7 @@ GOOD: "How appealing is having a private server location?"
 
 Return ONLY the question. No explanation. Under 12 words. No "and". End with ?"""
 
-    response = ask_claude(prompt)
+    response = ask_claude(prompt, temperature=0.3)  # Natural phrasing
     
     # Clean up the response
     question = response.strip()
@@ -152,15 +162,26 @@ def get_user_response(transcript):
     return ' '.join(user_parts)
 
 
-def ask_claude(prompt):
-    """Send a prompt to Claude and get the response back."""
+def ask_claude(prompt, temperature=0):
+    """Send a prompt to Claude Opus 4.5 for extraction tasks."""
     response = claude.messages.create(
-        model="claude-sonnet-4-5-20250929",
+        model=CLAUDE_MODEL,
         max_tokens=8192,
-        temperature=0,
+        temperature=temperature,
         messages=[{"role": "user", "content": prompt}]
     )
     return response.content[0].text
+
+
+def ask_gpt(prompt):
+    """Send a prompt to GPT-5.1 for summaries."""
+    response = openai_client.chat.completions.create(
+        model=OPENAI_MODEL,
+        max_completion_tokens=1024,
+        temperature=0.5,  # Natural variation for summaries
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content
 
 
 def get_json_from_response(text):
@@ -202,49 +223,59 @@ def make_theme_prompt(question, responses):
     Build the prompt that tells Claude how to create themes.
     This is where all the formatting rules live.
     """
-    return f"""You are a senior researcher. Executive clarity.
+    return f"""You are a paid senior qualitative researcher at a top consultancy. Executive-grade analysis.
 
 Question: "{question}"
 
 Data:
 {responses}
 
-Create exactly 3 themes. Assign EVERY participant to one theme.
+THEME COUNT: Create 3, 4, or 5 themes based on natural clustering in the data.
+- 3 themes: When responses cluster tightly into distinct camps
+- 4 themes: When a fourth segment is meaningfully distinct
+- 5 themes: Only when data genuinely splits five ways
+
+Do NOT default to 5. Fewer themes with stronger cohesion beats more themes with overlap.
+
+Assign EVERY participant to exactly one theme.
 
 Return valid JSON only:
 {{
   "themes": [
     {{
-      "title": "Theme title under 8 words",
-      "description": "4-5 sentences with 2-3 DIFFERENT metrics. Mention specific features from data. End with business implication.",
-      "participant_ids": ["id1", "id2", ...]
+      "title": "Under 6 words. Sharp.",
+      "description": "3-4 sentences. Senior researcher voice. First sentence = the core insight. Middle = evidence and texture from the data. Final = business implication or strategic read.",
+      "participant_ids": ["id1", "id2", ...],
+      "best_quote_ids": ["id1", "id2", "id3"]
     }}
   ]
 }}
 
-TERMINOLOGY: Say "participants" NOT "users/respondents/consumers"
+CRITICAL - best_quote_ids: Select 3 participant IDs whose verbatim responses DIRECTLY PROVE your description. Read your description, then pick quotes that a reader would say "yes, that quote proves the point." If your description says "no-logs policies dominate," pick quotes that mention no-logs. If your description says "price wins," pick quotes about cost.
 
-VARIED SENTENCE OPENINGS - do NOT always start with "Participants":
-- "Privacy concerns dominate...", "Security drives...", "Strong interest exists..."
-- "Technical complexity prevents...", "Cost sensitivity limits..."
-- "No-logs policies emerge as...", "Speed and reliability rank..."
+VOICE: You've done 200 of these studies. You see patterns others miss. Confident, direct, zero hedging.
 
-CRITICAL: VARY YOUR METRICS - do NOT overuse percentages. Use MAX 1 percentage per theme.
+SAY "participants" NOT "users/respondents"
 
-Instead of percentages, prefer these metric types:
-- Ratio: "Privacy outweighs cost 3:1", "Speed concerns outnumber security issues 2:1"
-- Ranking: "No-logs policies rank as the top priority", "Speed emerges as the primary concern"
-- Qualitative: "Strong preference exists for...", "Significant resistance appears toward..."
-- Comparative: "Speed matters more than price", "Convenience outweighs security for this segment"
-- Proportion words: "most", "majority", "half", "minority", "few", "nearly all"
+VARY YOUR ATTACK - each theme MUST open differently:
 
-BAD example (too many %):
-"65% prioritize privacy. Within this group, 70% mention encryption and 55% focus on no-logs. Roughly 80% express concern."
+A - Lead with behavior: "They've churned through three VPNs already. Reliability trumps features."
 
-GOOD example (varied metrics):
-"Privacy concerns dominate selection criteria, with no-logs policies ranking as the top priority. Encryption strength matters more than server count for this segment. Strong preference exists for transparent security certifications, and most participants specifically mention identity protection. This represents premium customers willing to pay for verified privacy."
+B - Lead with tension: "Security matters but price wins. Premium positioning fails here."
 
-Each theme should use DIFFERENT metric types from other themes."""
+C - Lead with quote hook: "'Just make it work.' Setup friction kills adoption."
+
+D - Lead with contrast: "Unlike the speed crowd, these trade performance for privacy."
+
+E - Lead with data pattern: "No-logs appears in every response. Encryption ranks distant second."
+
+BANNED OPENERS:
+- "Participants in this theme..."
+- "This group values..."
+- "These participants..."
+- Any opener starting with "This" or "These"
+
+MAX 1 percentage per theme. Prefer: ratios, rankings, "most/few/nearly all", comparisons."""
 
 
 def make_summary_prompt(question, themes):
@@ -252,7 +283,7 @@ def make_summary_prompt(question, themes):
     theme_lines = [f"- {t['title']}: {t['pct']}%" for t in themes]
     theme_list = "\n".join(theme_lines)
     
-    return f"""Executive summary.
+    return f"""You are a paid senior researcher presenting to C-suite. Authoritative. No hedging.
 
 Question: {question}
 
@@ -260,14 +291,20 @@ Themes:
 {theme_list}
 
 Return JSON only:
-{{"headline": "Under 12 words. Key insight. Say 'participants' NOT 'users'.", "summary": "2 sentences. All three theme %. One recommendation. Say 'participants' NOT 'users'. NO counts."}}
+{{"headline": "Under 8 words. The strategic insight.", "summary": "1-2 sentences ONLY. State the key % breakdown. One actionable recommendation."}}
 
-No em dashes."""
+RULES:
+- Say "participants" not "users"
+- No em dashes
+- No hedging ("seems", "appears", "might", "could")
+- Use % symbol
+- MAXIMUM 2 sentences"""
 
 
 def pick_unique_quotes(themes, all_responses):
     """
     Pick quotes for each theme, making sure we don't repeat any.
+    Prioritizes best_quote_ids if available, then falls back to participant_ids.
     Each theme gets up to 3 quotes.
     """
     already_used = set()
@@ -275,7 +312,10 @@ def pick_unique_quotes(themes, all_responses):
     for theme in themes:
         quotes_for_theme = []
         
-        for participant_id in theme.get("participant_ids", []):
+        # Prioritize best_quote_ids, then fall back to participant_ids
+        quote_candidates = theme.get("best_quote_ids", []) + theme.get("participant_ids", [])
+        
+        for participant_id in quote_candidates:
             # Clean up the ID in case it has a P prefix
             clean_id = str(participant_id).replace("P", "")
             
@@ -333,7 +373,7 @@ def analyze_one_question(column_name, question_text, data, id_column):
     
     # Ask Claude to create themes
     theme_prompt = make_theme_prompt(question_text, formatted)
-    theme_response = ask_claude(theme_prompt)
+    theme_response = ask_claude(theme_prompt, temperature=0.1)  # Slight variation
     
     try:
         theme_data = get_json_from_response(theme_response)
@@ -360,9 +400,9 @@ def analyze_one_question(column_name, question_text, data, id_column):
     # Add quotes (no duplicates across themes)
     themes = pick_unique_quotes(themes, response_lookup)
     
-    # Ask Claude for the summary
+    # Ask GPT-5.1 for the summary (warmer, more conversational)
     summary_prompt = make_summary_prompt(question_text, themes)
-    summary_response = ask_claude(summary_prompt)
+    summary_response = ask_gpt(summary_prompt)
     
     try:
         summary = get_json_from_response(summary_response)
