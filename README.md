@@ -1,4 +1,4 @@
-# Research Agent for Thematic Analysis Insights
+# Thematic Analysis Agent for Research Insights
 
 **Turn messy survey responses into clean research insights-automatically.**
 
