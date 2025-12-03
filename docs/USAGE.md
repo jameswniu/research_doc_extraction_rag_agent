@@ -1,0 +1,120 @@
+# Usage Guide
+
+## Quick Start
+
+```bash
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY="your-claude-key"
+export OPENAI_API_KEY="your-openai-key"
+
+python src/pipeline.py data.xlsx output/results.json
+python src/report.py output/results.json output/report.md
+```
+
+## Model Architecture
+
+The pipeline uses two models:
+- **Claude Opus 4.5** - Question inference and theme extraction (heavy lifting)
+- **GPT-5.1** - Executive summary generation (authoritative, senior researcher tone)
+
+## Temperature Settings
+
+| Task | Model | Temp | Rationale |
+|------|-------|------|-----------|
+| Question inference | Claude | 0.3 | Natural phrasing variation |
+| Theme extraction | Claude | 0.1 | Near-deterministic |
+| Summary generation | GPT | 0.5 | Natural language variation |
+
+## Input Requirements
+
+The pipeline works with any Excel file that has:
+
+1. **An ID column** - Named "ID", "participant_id", "respondent_id", or similar. Falls back to the first column if nothing matches.
+
+2. **Question columns** - Any column where responses average more than 20 characters. The pipeline auto-detects these.
+
+### Transcript Format
+
+If your responses are in transcript format, the pipeline extracts just the user parts:
+
+```
+user: I really like the privacy features
+assistant: Can you tell me more?
+user: Especially the no-logs policy
+```
+
+Gets extracted as: "I really like the privacy features Especially the no-logs policy"
+
+## Output Files
+
+### JSON (results.json)
+
+```json
+{
+  "column_name": {
+    "question": "What factors influenced your decision when choosing your VPN?",
+    "n_participants": 105,
+    "headline": "Short insight (under 8 words)",
+    "summary": "1-2 sentences with actionable recommendation.",
+    "themes": [
+      {
+        "title": "Theme Name",
+        "description": "3-4 sentences. Senior researcher voice.",
+        "pct": 38,
+        "count": 40,
+        "participant_ids": ["101", "102"],
+        "quotes": [
+          {"participant_id": "101", "quote": "What they said"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Markdown (report.md)
+
+Human-readable report with headlines, theme descriptions, and quotes.
+
+## Customization
+
+### Changing the models
+
+Edit the model constants at the top of pipeline.py:
+
+```python
+CLAUDE_MODEL = "claude-opus-4-5-20251101"  # For extraction
+OPENAI_MODEL = "gpt-5.1"  # For summaries
+```
+
+### Adjusting column detection
+
+Edit `find_question_columns()` to change:
+- Which column names to skip (the `skip_patterns` list)
+- Minimum response count (currently 5)
+- Minimum average length (currently 20 chars)
+
+### Changing theme count
+
+Edit `make_theme_prompt()` - currently produces 3-5 themes based on natural clustering in the data.
+
+## Troubleshooting
+
+**"No valid responses"**
+- Check that your Excel has the expected column names
+- Make sure responses aren't all empty or very short
+
+**"Failed to parse themes"**
+- Usually means Claude returned something unexpected
+- Check your API key is valid
+- Try running again (rare API hiccups happen)
+
+**Duplicate quotes showing up**
+- The deduplication uses first 100 chars of each quote
+- Very similar responses might slip through
+
+## Running Tests
+
+```bash
+pytest tests/ -v
+```
