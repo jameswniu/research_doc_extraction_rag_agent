@@ -70,29 +70,29 @@ Output
 
 ## Key Design Decisions
 
-**Project background parameter** - The pipeline accepts optional research context that informs question inference and theme generation. This improves theme relevance to research objectives.
+**Project background parameter**: The pipeline accepts optional research context that informs question inference and theme generation. This improves theme relevance to research objectives.
 
-**Parallel execution** - Questions are analyzed concurrently using ThreadPoolExecutor (default 6 workers). Each question is independent, so parallelization is straightforward and provides ~6x speedup.
+**Parallel execution**: Questions are analyzed concurrently using ThreadPoolExecutor (default 6 workers). Each question is independent, so parallelization is straightforward and provides ~6x speedup.
 
-**Classification export** - Every participant → theme assignment is exported to Excel for manual review. This enables accuracy verification and audit trails.
+**Classification export**: Every participant → theme assignment is exported to Excel for manual review. This enables accuracy verification and audit trails.
 
-**Quote validation** - Quotes are validated against source data before inclusion. Mismatches are logged and auto-corrected using source text. This prevents hallucination.
+**Quote validation**: Quotes are validated against source data before inclusion. Mismatches are logged and auto-corrected using source text. This prevents hallucination.
 
-**Dual model architecture** - Claude Opus 4.5 handles the heavy lifting (question inference, theme extraction) while GPT-5.1 generates the executive summaries. Opus excels at precise extraction from messy data; GPT-5.1 produces authoritative, executive-grade summaries.
+**Dual model architecture**: Claude Opus 4.5 handles the heavy lifting (question inference, theme extraction) while GPT-5.1 generates the executive summaries. Opus excels at precise extraction from messy data; GPT-5.1 produces authoritative, executive-grade summaries.
 
-**Temperature tuning** - Different temperatures for different tasks: 0.3 for question inference (natural phrasing), 0.1 for theme extraction (near-deterministic), 0.5 for summaries (natural variation).
+**Temperature tuning**: Different temperatures for different tasks: 0.3 for question inference (natural phrasing), 0.3 for theme extraction (balanced accuracy and variation), 0.5 for summaries (natural variation).
 
-**Variable theme count** - 3-5 themes based on natural clustering in the data. Fewer themes with stronger cohesion beats more themes with overlap.
+**Variable theme count**: 3-5 themes based on natural clustering in the data. Fewer themes with stronger cohesion beats more themes with overlap.
 
-**Question inference** - Instead of guessing from column names like "vpn_selection", the pipeline samples actual responses and asks Claude Opus 4.5 what question was likely asked. This produces natural, specific questions like "What factors influenced your decision when choosing your VPN?"
+**Question inference**: Instead of guessing from column names like "vpn_selection", the pipeline samples actual responses and asks Claude Opus 4.5 what question was likely asked. This produces natural, specific questions like "What factors influenced your decision when choosing your VPN?"
 
-**Dynamic question detection** - The pipeline doesn't hardcode question names. It looks at column contents and picks out the ones that look like text responses. This makes it work with any survey structure.
+**Dynamic question detection**: The pipeline doesn't hardcode question names. It looks at column contents and picks out the ones that look like text responses. This makes it work with any survey structure.
 
-**Quote-description alignment** - The model selects best_quote_ids that directly prove the theme description. If description says "no-logs policies dominate," quotes mention no-logs.
+**Quote-description alignment**: The model selects best_quote_ids that directly prove the theme description. If description says "no-logs policies dominate," quotes mention no-logs.
 
-**Quote deduplication** - Quotes are tracked across themes so the same response never appears twice in the output.
+**Quote deduplication**: Quotes are tracked across themes so the same response never appears twice in the output.
 
-**Senior research tone** - Prompts explicitly ask for "$500/hour consultant voice" with no hedging, varied openings, and business implications.
+**Senior research tone**: Prompts explicitly ask for "$500/hour consultant voice" with no hedging, varied openings, and business implications.
 
 ## Components
 

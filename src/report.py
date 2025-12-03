@@ -23,7 +23,7 @@ def create_report(results, output_file):
     ]
     
     lines = [
-        "# Thematic Analysis",
+        "# Agentic Research for Thematic Analysis Insights",
         ""
     ]
     

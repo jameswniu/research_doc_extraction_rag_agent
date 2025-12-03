@@ -14,24 +14,24 @@ python src/report.py output/results.json output/report.md
 ## Model Architecture
 
 The pipeline uses two models:
-- **Claude Opus 4.5** - Question inference and theme extraction (heavy lifting)
-- **GPT-5.1** - Executive summary generation (authoritative, senior researcher tone)
+- **Claude Opus 4.5**: Question inference and theme extraction (heavy lifting)
+- **GPT-5.1**: Executive summary generation (authoritative, senior researcher tone)
 
 ## Temperature Settings
 
 | Task | Model | Temp | Rationale |
 |------|-------|------|-----------|
 | Question inference | Claude | 0.3 | Natural phrasing variation |
-| Theme extraction | Claude | 0.1 | Near-deterministic |
+| Theme extraction | Claude | 0.3 | Balanced accuracy and variation |
 | Summary generation | GPT | 0.5 | Natural language variation |
 
 ## Input Requirements
 
 The pipeline works with any Excel file that has:
 
-1. **An ID column** - Named "ID", "participant_id", "respondent_id", or similar. Falls back to the first column if nothing matches.
+1. **An ID column**: Named "ID", "participant_id", "respondent_id", or similar. Falls back to the first column if nothing matches.
 
-2. **Question columns** - Any column where responses average more than 20 characters. The pipeline auto-detects these.
+2. **Question columns**: Any column where responses average more than 20 characters. The pipeline auto-detects these.
 
 ### Transcript Format
 

@@ -229,19 +229,8 @@ def get_json_from_response(text):
 
 
 def sanitize_background(text):
-    """Remove placeholder words like CLIENT, COMPANY from project background."""
-    if not text:
-        return text
-    # Replace common placeholders with generic terms
-    replacements = [
-        ("CLIENT's", "the company's"),
-        ("CLIENT", "the company"),
-        ("COMPANY's", "the company's"),
-        ("COMPANY", "the company"),
-    ]
-    for old, new in replacements:
-        text = text.replace(old, new)
-    return text
+    """Pass through project background as-is."""
+    return text if text else ""
 
 
 def make_theme_prompt(question, responses, project_background=""):
@@ -313,9 +302,7 @@ BANNED OPENERS:
 - "These participants..."
 - Any opener starting with "This" or "These"
 
-MAX 1 percentage per theme. Prefer: ratios, rankings, "most/few/nearly all", comparisons.
-
-NEVER use placeholder words like "CLIENT" or "COMPANY" in your output - write generically about "brands", "providers", or "the product" instead."""
+MAX 1 percentage per theme. Prefer: ratios, rankings, "most/few/nearly all", comparisons."""
 
 
 def make_summary_prompt(question, themes, project_background=""):
@@ -345,8 +332,7 @@ RULES:
 - No em dashes
 - No hedging ("seems", "appears", "might", "could")
 - Use % symbol
-- MAXIMUM 2 sentences
-- NEVER use placeholder words like "CLIENT" - write generically"""
+- MAXIMUM 2 sentences"""
 
 
 def ensure_all_classified(themes, all_participant_ids, response_lookup):

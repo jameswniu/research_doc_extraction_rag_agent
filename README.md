@@ -1,6 +1,6 @@
-# Thematic Analysis Pipeline
+# Agentic Research for Thematic Analysis Insights
 
-**Turn messy survey responses into clean research insights-automatically.**
+**Turn messy survey responses into clean research insights, automatically.**
 
 Drop in an Excel file, get back organized themes with quotes and executive summaries. Uses Claude Opus 4.5 to find patterns and GPT-5.1 to write the summaries.
 
@@ -18,7 +18,7 @@ What's inside:
 
 ### Why Two Models?
 
-Claude Opus 4.5 handles the heavy lifting-parsing transcripts, assigning participants to themes, selecting quote IDs. It's precise and follows structured output formats well. GPT-5.1 writes the headlines and summaries with a warmer, more executive tone. Each model does what it's best at.
+Claude Opus 4.5 handles the heavy lifting: parsing transcripts, assigning participants to themes, selecting quote IDs. It's precise and follows structured output formats well. GPT-5.1 writes the headlines and summaries with a warmer, more executive tone. Each model does what it's best at.
 
 ### Temperature Settings
 
@@ -287,9 +287,9 @@ pytest tests/ -v
 ### Design Decisions
 
 - **Temperature tuning**: Theme extraction uses 0.3 (was 0.1, raised for more natural descriptions) to balance accuracy with varied language. Summaries use 0.5 for natural variation. Question inference uses 0.3 for fluent phrasing.
-- **3-5 themes default**: The prompt explicitly discourages defaulting to 5 themes—fewer themes with stronger cohesion beats more themes with overlap.
+- **3-5 themes default**: The prompt explicitly discourages defaulting to 5 themes. Fewer themes with stronger cohesion beats more themes with overlap.
 - **Quote selection via `best_quote_ids`**: The model selects the 3 participant IDs whose quotes best support each theme description, then we fetch verbatim quotes from source data. This prevents hallucination.
-- **Global quote deduplication**: Quotes are tracked across all themes per question—no quote appears twice.
+- **Global quote deduplication**: Quotes are tracked across all themes per question. No quote appears twice.
 - **One quote per participant per theme**: Each theme can only cite a given participant once.
 - **100% classification enforcement**: Post-processing ensures every participant is assigned to exactly one theme, even if the model misses some.
 
@@ -308,7 +308,6 @@ pytest tests/ -v
 | Quote validation | Zero hallucinated quotes | Extra processing step |
 | Concurrent execution | ~6x faster for 6 questions | Higher API rate limit usage |
 | Temperature 0.3 for themes | More varied descriptions | Slightly less deterministic |
-| Project background sanitization | No "CLIENT" placeholders in output | Requires maintenance of replacement list |
 
 ### Production Considerations
 
@@ -323,7 +322,7 @@ pytest tests/ -v
 - **Multi-language support**: Detect response language and adjust prompts accordingly
 - **Batch API**: For large datasets, use Claude's batch API to reduce costs
 
-### What I'd Do Differently
+### Future Improvements
 
 - **Single model**: In production, I'd likely consolidate to Claude for everything (summaries too) to reduce complexity and API dependencies
 - **Structured outputs**: Use Claude's native JSON mode / tool use for more reliable parsing
