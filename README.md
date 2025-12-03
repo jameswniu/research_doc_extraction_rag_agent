@@ -1,6 +1,6 @@
 # Thematic Analysis Agent for Research Insights
 
-**Turn messy survey responses into clean research insights-automatically.**
+**Turn messy survey responses into clean research insights automatically.**
 
 Drop in an Excel file, get back organized themes with quotes and executive summaries. Uses Claude Opus 4.5 to find patterns and GPT-5.1 to write the summaries.
 
