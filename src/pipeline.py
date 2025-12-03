@@ -16,6 +16,7 @@ import json
 import sys
 import re
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from anthropic import Anthropic
 from openai import OpenAI
 
@@ -26,6 +27,9 @@ openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # Model configuration
 CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Heavy lifting: inference, themes
 OPENAI_MODEL = "gpt-5.1"  # Summaries: authoritative, executive tone
+
+# Concurrency settings
+MAX_WORKERS = 6  # Parallel question analysis
 
 
 def find_question_columns(df):
@@ -82,7 +86,7 @@ def column_to_question(column_name):
     return f"What are your thoughts on {text}?"
 
 
-def infer_question_from_responses(column_name, sample_responses):
+def infer_question_from_responses(column_name, sample_responses, project_background=""):
     """
     Use Claude to figure out what question was asked based on how people answered.
     Much better than guessing from the column name alone.
@@ -90,7 +94,14 @@ def infer_question_from_responses(column_name, sample_responses):
     # Take first 10 responses for better inference
     examples = "\n".join([f"- {r[:200]}" for r in sample_responses[:10]])
     
-    prompt = f"""Look at these survey responses and figure out what question was asked.
+    context_block = ""
+    if project_background:
+        context_block = f"""Project context:
+{project_background}
+
+"""
+    
+    prompt = f"""{context_block}Look at these survey responses and figure out what question was asked.
 
 Column name: {column_name}
 
@@ -206,7 +217,6 @@ def get_json_from_response(text):
         import re
         
         # Fix 1: Missing ] to close themes array before final }
-        # Pattern: ]\n  }\n} should be ]\n    }\n  ]\n}
         json_str = re.sub(r'\]\s*\}\s*\}$', ']\n    }\n  ]\n}', json_str)
         
         # Fix 2: Missing } before closing ] of themes array
@@ -218,12 +228,40 @@ def get_json_from_response(text):
             return {}
 
 
-def make_theme_prompt(question, responses):
+def sanitize_background(text):
+    """Remove placeholder words like CLIENT, COMPANY from project background."""
+    if not text:
+        return text
+    # Replace common placeholders with generic terms
+    replacements = [
+        ("CLIENT's", "the company's"),
+        ("CLIENT", "the company"),
+        ("COMPANY's", "the company's"),
+        ("COMPANY", "the company"),
+    ]
+    for old, new in replacements:
+        text = text.replace(old, new)
+    return text
+
+
+def make_theme_prompt(question, responses, project_background=""):
     """
     Build the prompt that tells Claude how to create themes.
     This is where all the formatting rules live.
     """
-    return f"""You are a paid senior qualitative researcher at a top consultancy. Executive-grade analysis.
+    context_block = ""
+    if project_background:
+        clean_bg = sanitize_background(project_background)
+        context_block = f"""PROJECT CONTEXT:
+{clean_bg}
+
+Use this context to inform your theme analysis. Themes should be relevant to the research objectives described above.
+
+---
+
+"""
+    
+    return f"""{context_block}You are a paid senior qualitative researcher at a top consultancy. Executive-grade analysis.
 
 Question: "{question}"
 
@@ -275,15 +313,24 @@ BANNED OPENERS:
 - "These participants..."
 - Any opener starting with "This" or "These"
 
-MAX 1 percentage per theme. Prefer: ratios, rankings, "most/few/nearly all", comparisons."""
+MAX 1 percentage per theme. Prefer: ratios, rankings, "most/few/nearly all", comparisons.
+
+NEVER use placeholder words like "CLIENT" or "COMPANY" in your output - write generically about "brands", "providers", or "the product" instead."""
 
 
-def make_summary_prompt(question, themes):
+def make_summary_prompt(question, themes, project_background=""):
     """Build the prompt for creating the executive summary."""
     theme_lines = [f"- {t['title']}: {t['pct']}%" for t in themes]
     theme_list = "\n".join(theme_lines)
     
-    return f"""You are a paid senior researcher presenting to C-suite. Authoritative. No hedging.
+    context_block = ""
+    if project_background:
+        clean_bg = sanitize_background(project_background[:500])
+        context_block = f"""Project context: {clean_bg}...
+
+"""
+    
+    return f"""{context_block}You are a paid senior researcher presenting to C-suite. Authoritative. No hedging.
 
 Question: {question}
 
@@ -298,7 +345,85 @@ RULES:
 - No em dashes
 - No hedging ("seems", "appears", "might", "could")
 - Use % symbol
-- MAXIMUM 2 sentences"""
+- MAXIMUM 2 sentences
+- NEVER use placeholder words like "CLIENT" - write generically"""
+
+
+def ensure_all_classified(themes, all_participant_ids, response_lookup):
+    """
+    Ensure every participant is assigned to exactly one theme.
+    Removes duplicates across themes and assigns missing participants.
+    """
+    all_ids = set(all_participant_ids)
+    
+    # First pass: remove duplicates across themes (keep first occurrence)
+    seen = set()
+    for theme in themes:
+        pids = theme.get("participant_ids", [])
+        cleaned = []
+        for pid in pids:
+            if pid not in seen:
+                cleaned.append(pid)
+                seen.add(pid)
+        theme["participant_ids"] = cleaned
+    
+    # Find missing participants
+    missing = all_ids - seen
+    
+    if not missing:
+        return themes
+    
+    # Assign missing participants to the largest theme (simple heuristic)
+    # In production, would use embedding similarity to find best theme
+    if themes and missing:
+        largest_theme = max(themes, key=lambda t: len(t.get("participant_ids", [])))
+        largest_theme["participant_ids"].extend(list(missing))
+    
+    return themes
+
+
+def validate_quotes(themes, response_lookup):
+    """
+    Validate that all quotes exist in source data.
+    Returns themes with validation metadata and fixes any issues.
+    """
+    validation_issues = []
+    
+    for theme in themes:
+        valid_quotes = []
+        for quote in theme.get("quotes", []):
+            pid = str(quote.get("participant_id", "")).replace("P", "")
+            quote_text = quote.get("quote", "")
+            
+            # Check if participant exists in source
+            if pid not in response_lookup:
+                validation_issues.append({
+                    "type": "missing_participant",
+                    "theme": theme.get("title"),
+                    "participant_id": pid
+                })
+                continue
+            
+            # Check if quote matches source (allowing for truncation)
+            source_text = response_lookup[pid]
+            if quote_text not in source_text and source_text not in quote_text:
+                # Try fuzzy match - first 50 chars
+                if quote_text[:50].lower().strip() != source_text[:50].lower().strip():
+                    validation_issues.append({
+                        "type": "quote_mismatch",
+                        "theme": theme.get("title"),
+                        "participant_id": pid,
+                        "expected": source_text[:100],
+                        "got": quote_text[:100]
+                    })
+                    # Fix: use source text instead
+                    quote["quote"] = source_text
+            
+            valid_quotes.append(quote)
+        
+        theme["quotes"] = valid_quotes
+    
+    return themes, validation_issues
 
 
 def pick_unique_quotes(themes, all_responses):
@@ -343,7 +468,7 @@ def pick_unique_quotes(themes, all_responses):
     return themes
 
 
-def analyze_one_question(column_name, question_text, data, id_column):
+def analyze_one_question(column_name, question_text, data, id_column, project_background=""):
     """
     Run the full analysis for a single question.
     Returns a dict with themes, quotes, headline, and summary.
@@ -372,8 +497,8 @@ def analyze_one_question(column_name, question_text, data, id_column):
     ])
     
     # Ask Claude to create themes
-    theme_prompt = make_theme_prompt(question_text, formatted)
-    theme_response = ask_claude(theme_prompt, temperature=0.1)  # Slight variation
+    theme_prompt = make_theme_prompt(question_text, formatted, project_background)
+    theme_response = ask_claude(theme_prompt, temperature=0.3)  # Natural variation in descriptions
     
     try:
         theme_data = get_json_from_response(theme_response)
@@ -388,6 +513,10 @@ def analyze_one_question(column_name, question_text, data, id_column):
     
     # Build a lookup so we can grab quotes later
     response_lookup = {r["id"]: r["text"] for r in responses}
+    all_participant_ids = [r["id"] for r in responses]
+    
+    # Ensure all participants are classified to exactly one theme
+    themes = ensure_all_classified(themes, all_participant_ids, response_lookup)
     
     # Figure out percentages and sort biggest first
     for theme in themes:
@@ -400,8 +529,11 @@ def analyze_one_question(column_name, question_text, data, id_column):
     # Add quotes (no duplicates across themes)
     themes = pick_unique_quotes(themes, response_lookup)
     
+    # Validate quotes against source data
+    themes, validation_issues = validate_quotes(themes, response_lookup)
+    
     # Ask GPT-5.1 for the summary (authoritative, executive tone)
-    summary_prompt = make_summary_prompt(question_text, themes)
+    summary_prompt = make_summary_prompt(question_text, themes, project_background)
     summary_response = ask_gpt(summary_prompt)
     
     try:
@@ -411,13 +543,82 @@ def analyze_one_question(column_name, question_text, data, id_column):
     
     print(f"done ({total})")
     
-    return {
+    result = {
         "question": question_text,
         "n_participants": total,
         "headline": summary.get("headline", ""),
         "summary": summary.get("summary", ""),
-        "themes": themes
+        "themes": themes,
+        "classifications": build_classification_data(themes, response_lookup)
     }
+    
+    if validation_issues:
+        result["validation_issues"] = validation_issues
+    
+    return result
+
+
+def build_classification_data(themes, response_lookup):
+    """
+    Build a flat list of participant -> theme assignments for inspection.
+    """
+    classifications = []
+    for theme in themes:
+        theme_title = theme.get("title", "Unknown")
+        for pid in theme.get("participant_ids", []):
+            clean_id = str(pid).replace("P", "")
+            classifications.append({
+                "participant_id": clean_id,
+                "theme": theme_title,
+                "response": response_lookup.get(clean_id, "")[:200]
+            })
+    return classifications
+
+
+def export_classifications(results, output_dir):
+    """
+    Export theme classifications to Excel files for inspection.
+    One file per question column.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    for col_name, data in results.items():
+        if "error" in data:
+            continue
+        
+        classifications = data.get("classifications", [])
+        if not classifications:
+            continue
+        
+        df = pd.DataFrame(classifications)
+        
+        # Add question context
+        df["question"] = data.get("question", col_name)
+        
+        # Reorder columns
+        cols = ["participant_id", "theme", "response", "question"]
+        df = df[cols]
+        
+        # Save to Excel
+        filepath = os.path.join(output_dir, f"{col_name}_classifications.xlsx")
+        df.to_excel(filepath, index=False)
+        print(f"  Exported classifications: {filepath}")
+    
+    # Also create a combined file
+    all_classifications = []
+    for col_name, data in results.items():
+        if "error" in data:
+            continue
+        for c in data.get("classifications", []):
+            c["column"] = col_name
+            c["question"] = data.get("question", col_name)
+            all_classifications.append(c)
+    
+    if all_classifications:
+        combined_df = pd.DataFrame(all_classifications)
+        combined_path = os.path.join(output_dir, "all_classifications.xlsx")
+        combined_df.to_excel(combined_path, index=False)
+        print(f"  Exported combined classifications: {combined_path}")
 
 
 def find_id_column(df):
@@ -440,13 +641,22 @@ def clean_dashes(obj):
     return obj
 
 
-def run(excel_file, output_file):
+def run(excel_file, output_file, project_background=""):
     """
     Main entry point. Load the data, analyze each question, save results.
+    
+    Args:
+        excel_file: Path to Excel file with survey responses
+        output_file: Path to save JSON results
+        project_background: Optional context about the research project
+                           (used to inform theme analysis and question inference)
     """
     print(f"Loading data from {excel_file}")
     data = pd.read_excel(excel_file)
     print(f"Found {len(data)} rows\n")
+    
+    if project_background:
+        print(f"Using project background ({len(project_background)} chars)\n")
     
     # Find the ID column
     id_column = find_id_column(data)
@@ -473,23 +683,31 @@ def run(excel_file, output_file):
                 break
         
         if sample_responses:
-            questions[col] = infer_question_from_responses(col, sample_responses)
+            questions[col] = infer_question_from_responses(col, sample_responses, project_background)
         else:
             questions[col] = column_to_question(col)
         
         print(f"  {col}: {questions[col]}")
     print()
     
-    print("Analyzing questions:")
+    print(f"Analyzing questions (parallel, {MAX_WORKERS} workers):")
     results = {}
     
-    for col in question_columns:
-        question_text = questions[col]
-        try:
-            results[col] = analyze_one_question(col, question_text, data, id_column)
-        except Exception as e:
-            print(f"failed: {e}")
-            results[col] = {"error": str(e)}
+    # Analyze questions in parallel
+    def analyze_wrapper(col):
+        return col, analyze_one_question(col, questions[col], data, id_column, project_background)
+    
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {executor.submit(analyze_wrapper, col): col for col in question_columns}
+        
+        for future in as_completed(futures):
+            try:
+                col, result = future.result()
+                results[col] = result
+            except Exception as e:
+                col = futures[future]
+                print(f"  {col}... failed: {e}")
+                results[col] = {"error": str(e)}
     
     # Clean up any fancy dashes
     results = clean_dashes(results)
@@ -500,16 +718,32 @@ def run(excel_file, output_file):
         json.dump(results, f, indent=2)
     
     print(f"\nResults saved to {output_file}")
+    
+    # Export classification files for inspection
+    output_dir = os.path.dirname(output_file) or "output"
+    classifications_dir = os.path.join(output_dir, "classifications")
+    print("\nExporting classification files for review:")
+    export_classifications(results, classifications_dir)
+    
     return results
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python pipeline.py <excel_file> [output_file]")
-        print("Example: python pipeline.py data.xlsx output/results.json")
+        print("Usage: python pipeline.py <excel_file> [output_file] [project_background_file]")
+        print("Example: python pipeline.py data.xlsx output/results.json background.txt")
         sys.exit(1)
     
     excel_file = sys.argv[1]
     output_file = sys.argv[2] if len(sys.argv) > 2 else "output/results.json"
     
-    run(excel_file, output_file)
+    # Load project background if provided
+    project_background = ""
+    if len(sys.argv) > 3:
+        bg_file = sys.argv[3]
+        if os.path.exists(bg_file):
+            with open(bg_file, 'r') as f:
+                project_background = f.read()
+            print(f"Loaded project background from {bg_file}")
+    
+    run(excel_file, output_file, project_background)

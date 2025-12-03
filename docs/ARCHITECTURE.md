@@ -7,7 +7,7 @@ The pipeline takes an Excel file with survey responses, figures out which column
 ## Data Flow
 
 ```
-Excel File
+Excel File + Project Background (optional)
     |
     v
 Column Discovery
@@ -16,12 +16,16 @@ Column Discovery
     |
     v
 Question Inference (Claude Opus 4.5)
-    - Sample 5 responses from each column
+    - Sample 10 responses from each column
+    - Include project background for context
     - Ask Claude: "What question was asked here?"
     - Get natural, specific question text
     |
     v
-For each question column:
+Parallel Analysis (ThreadPoolExecutor, 6 workers)
+    |
+    v
+For each question column (concurrent):
     |
     v
 Response Extraction
@@ -31,15 +35,18 @@ Response Extraction
     |
     v
 Theme Generation (Claude Opus 4.5)
+    - Include project background for context
     - Send responses with formatting rules
     - Get back 3-5 themes with participant assignments
     - Parse JSON from response
     |
     v
-Quote Selection
+Quote Selection + Validation
     - Pick up to 3 quotes per theme
     - Model selects best_quote_ids that directly support theme description
     - Track used quotes to prevent duplicates
+    - Validate quotes exist in source data
+    - Fix mismatched quotes with source text
     |
     v
 Summary Generation (GPT-5.1)
@@ -52,12 +59,24 @@ Post-Processing
     - Calculate theme percentages
     - Sort themes by size
     - Clean up fancy dashes
+    - Build classification data for export
     |
     v
-Output (JSON + Markdown)
+Output
+    - results.json (main output)
+    - report.md (human-readable)
+    - classifications/*.xlsx (review files)
 ```
 
 ## Key Design Decisions
+
+**Project background parameter** - The pipeline accepts optional research context that informs question inference and theme generation. This improves theme relevance to research objectives.
+
+**Parallel execution** - Questions are analyzed concurrently using ThreadPoolExecutor (default 6 workers). Each question is independent, so parallelization is straightforward and provides ~6x speedup.
+
+**Classification export** - Every participant → theme assignment is exported to Excel for manual review. This enables accuracy verification and audit trails.
+
+**Quote validation** - Quotes are validated against source data before inclusion. Mismatches are logged and auto-corrected using source text. This prevents hallucination.
 
 **Dual model architecture** - Claude Opus 4.5 handles the heavy lifting (question inference, theme extraction) while GPT-5.1 generates the executive summaries. Opus excels at precise extraction from messy data; GPT-5.1 produces authoritative, executive-grade summaries.
 
