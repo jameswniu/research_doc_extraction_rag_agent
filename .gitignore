@@ -20,9 +20,6 @@ env/
 .DS_Store
 Thumbs.db
 
-*.xlsx
-*.xls
-
 .env
 .env.local
 
