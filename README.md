@@ -1,4 +1,4 @@
-# AI-Powered Thematic Analysis Pipeline
+# Agentic Insights Extraction for Thematic Analysis
 
 **Turn messy survey responses into clean research insights-automatically.**
 
