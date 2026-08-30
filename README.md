@@ -195,36 +195,21 @@ Every number below is re-derived from `output/results.json` by `docs/generate_vi
 
 The shipped run covers 6 questions and 495 participants from a VPN research study, producing 26 themes. One question's percentages total 99 rather than 100 because the published values are integers; the underlying counts still sum exactly.
 
-## Setup
+## Run it on a spreadsheet
 
 ```bash
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY="your-key"
 export OPENAI_API_KEY="your-key"
+
+python src/pipeline.py survey_data.xlsx output/results.json                         # analyze
+python src/pipeline.py survey_data.xlsx output/results.json project_background.txt  # with research context
+python src/report.py output/results.json output/report.md                           # stakeholder report
+pytest tests/ -v                                                                    # 22 tests, no API key needed
 ```
 
-## Usage
+The optional third argument is a plain-text research brief. It reaches the question-inference and theme prompts, which keeps themes relevant to what the study was for instead of generically plausible:
 
-```bash
-# Basic usage
-python src/pipeline.py survey_data.xlsx output/results.json
-
-# With project background context (recommended)
-python src/pipeline.py survey_data.xlsx output/results.json project_background.txt
-
-# Generate markdown report
-python src/report.py output/results.json output/report.md
-```
-
-### Project Background Parameter
-
-The pipeline accepts an optional `project_background` parameter that provides research context. This context is used to:
-
-1. Inform question inference (better understanding of what was asked)
-2. Guide theme generation (themes align with research objectives)
-3. Shape summary language (relevant to project goals)
-
-Example `project_background.txt`:
 ```
 Primary Goal: Understand the consumer privacy market, specifically VPNs and data deletion services.
 
@@ -234,35 +219,30 @@ Learning Objectives:
 - Assess willingness to pay
 ```
 
-### Classification Export
+Column headers are never trusted. The pipeline samples the answers in each free-text column and reconstructs what was asked:
 
-After analysis, the pipeline automatically exports classification files to `output/classifications/`:
-
-- `{column}_classifications.xlsx` - Per-question participant → theme mappings
-- `all_classifications.xlsx` - Combined view across all questions
-
-These files enable manual review of theme assignments for accuracy verification.
-
-### Concurrency
-
-Questions are analyzed in parallel (default: 6 workers). Adjust `MAX_WORKERS` in `pipeline.py` based on API rate limits.
-
-The pipeline will automatically find:
-- The ID column (looks for "id", "participant_id", etc.)
-- Question columns (any column with text responses longer than 20 chars average)
-- The actual question text (inferred from how people responded)
-
-### Question Inference Example
-
-Instead of guessing from column names like `vpn_selection`, the pipeline samples responses and asks Claude what question was likely asked:
-
-| Column | Inferred Question |
+| Column | Inferred question |
 |--------|-------------------|
 | vpn_selection | What factors were most important when selecting your VPN? |
 | current_vpn_feedback | What features do you wish your VPN had? |
 | remove_data_steps_probe_no | Would you be interested in removing your personal information from online databases? |
 
-## Output Format
+## What a run leaves on disk
+
+Three artifacts, one audience each.
+
+- `output/results.json` is the full analysis: per question, the inferred question, a headline, 3 to 5 themes with percentages, and quote ids resolved against source rows.
+- `output/classifications/` holds one `.xlsx` per question plus a combined sheet, mapping every participant to their theme, so an analyst can audit or re-code any assignment by hand.
+- `output/report.md` is the human layer, written by the second model in a warmer register.
+
+One theme from the shipped run, as the report renders it:
+
+**Privacy and Security Focus** (37%)
+
+Privacy concerns dominate selection criteria, with no-logs policies ranking as the top priority. Encryption strength matters more than server count for this segment. Strong preference exists for transparent security certifications, and most participants specifically mention identity protection. This represents premium customers willing to pay for verified privacy.
+
+<details>
+<summary>Full <code>results.json</code> shape</summary>
 
 ```json
 {
@@ -285,100 +265,53 @@ Instead of guessing from column names like `vpn_selection`, the pipeline samples
 }
 ```
 
-## Example Output
+</details>
 
-**Privacy and Security Focus** (37%)
+## The dials
 
-Privacy concerns dominate selection criteria, with no-logs policies ranking as the top priority. Encryption strength matters more than server count for this segment. Strong preference exists for transparent security certifications, and most participants specifically mention identity protection. This represents premium customers willing to pay for verified privacy.
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| Claude model | claude-opus-4-5-20251101 | Theme extraction |
+| GPT model | gpt-5.1 | Summary generation |
+| Extraction temp | 0.3 | Balanced accuracy and natural language |
+| Summary temp | 0.5 | Natural language variation |
+| Inference temp | 0.3 | Natural question phrasing |
 
-## Project Structure
+Theme extraction started at temperature 0.1 and read like a form. 0.3 buys natural descriptions without letting the classifier drift, and the summary model runs warmer at 0.5 because prose benefits from variation that classification cannot afford. Questions run in parallel, six workers by default, so wall-clock is roughly one question rather than six; `MAX_WORKERS` in `pipeline.py` is the knob when rate limits bite.
+
+The input contract is small: an ID column the loader can spot by value shape, free-text columns averaging over 20 characters, unique participant ids. Blank responses are excluded rather than guessed at.
+
+## Tradeoffs and open gaps
+
+| Decision | Benefit | Cost |
+|----------|---------|------|
+| Two models | Best of both, precision plus prose | Higher latency, two API keys |
+| Quote validation | Zero hallucinated quotes | Extra processing step |
+| Concurrent execution | ~6x faster for 6 questions | Higher API rate limit usage |
+| Temperature 0.3 for themes | More varied descriptions | Slightly less deterministic |
+
+The gaps are real and named: no retry or backoff on API failures, no response caching, no schema validation beyond the verify stage's id resolution, and no batch-API path for very large studies. The first consolidation a production build would make is running everything on one model; two models bought precision plus prose for this study, and that trade reads differently at operational scale.
+
+## Project structure
 
 ```
 customer-survey-qualitative-thematic-analysis/
 ├── src/
 │   ├── __init__.py
-│   ├── pipeline.py        # Main analysis
-│   └── report.py          # Report generator
+│   ├── pipeline.py        # discover, infer, cluster, verify
+│   └── report.py          # the summarize stage
 ├── tests/
-│   ├── __init__.py
-│   └── test_pipeline.py   # Unit tests
+│   └── test_pipeline.py   # 22 tests, all offline
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   └── USAGE.md
 ├── output/
 │   ├── results.json
 │   ├── report.md
-│   └── classifications/   # NEW: Theme assignment files
-│       ├── vpn_selection_classifications.xlsx
-│       ├── current_vpn_feedback_classifications.xlsx
-│       └── all_classifications.xlsx
-├── project_background.txt # NEW: Research context
-├── .gitignore
-├── requirements.txt
-└── README.md
+│   └── classifications/   # per-question + combined .xlsx
+├── project_background.txt # research context, optional
+└── requirements.txt
 ```
-
-## Configuration
-
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| Claude Model | claude-opus-4-5-20251101 | Theme extraction |
-| GPT Model | gpt-5.1 | Summary generation |
-| Extraction Temp | 0.3 | Balanced accuracy and natural language |
-| Summary Temp | 0.5 | Natural language variation |
-| Inference Temp | 0.3 | Natural question phrasing |
-
-## Tests
-
-```bash
-pytest tests/ -v
-```
-
-## Design Discussion
-
-### Design Decisions
-
-- **Temperature tuning**: Theme extraction uses 0.3 (was 0.1, raised for more natural descriptions) to balance accuracy with varied language. Summaries use 0.5 for natural variation. Question inference uses 0.3 for fluent phrasing.
-- **3-5 themes default**: The prompt explicitly discourages defaulting to 5 themes. Fewer themes with stronger cohesion beats more themes with overlap.
-- **One quote per participant per theme**: Each theme can only cite a given participant once.
-- **100% classification enforcement**: Post-processing ensures every participant is assigned to exactly one theme, even if the model misses some.
-
-### Assumptions
-
-- Excel files have an ID column (auto-detected by looking for "id", "participant_id", etc.)
-- Question columns contain text responses averaging >20 characters
-- Blank/null responses are excluded from analysis
-- Participant IDs are unique within the dataset
-
-### Tradeoffs
-
-| Decision | Benefit | Cost |
-|----------|---------|------|
-| Two models | Best of both (precision + prose) | Higher latency, two API keys |
-| Quote validation | Zero hallucinated quotes | Extra processing step |
-| Concurrent execution | ~6x faster for 6 questions | Higher API rate limit usage |
-| Temperature 0.3 for themes | More varied descriptions | Slightly less deterministic |
-
-### Production Considerations
-
-- **Rate limiting**: Would add exponential backoff and retry logic for API failures
-- **Caching**: Cache theme responses by content hash to avoid re-running identical analyses
-- **Streaming**: Stream results to UI as each question completes rather than waiting for all
-- **Embedding-based classification**: For missing participant assignment, use embeddings to find semantically closest theme instead of defaulting to largest
-- **Human-in-the-loop**: Add a review step where analysts can reclassify edge cases before final output
-- **Audit logging**: Log all model inputs/outputs for debugging and compliance
-- **Cost tracking**: Track token usage per run for budgeting
-- **Schema validation**: Use Pydantic models to validate JSON responses before processing
-- **Multi-language support**: Detect response language and adjust prompts accordingly
-- **Batch API**: For large datasets, use Claude's batch API to reduce costs
-
-### Future Improvements
-
-- **Single model**: In production, I'd likely consolidate to Claude for everything (summaries too) to reduce complexity and API dependencies
-- **Structured outputs**: Use Claude's native JSON mode / tool use for more reliable parsing
-- **Incremental analysis**: For very large datasets, process in batches with intermediate saves
-- **Theme refinement loop**: Add a second pass where themes are reviewed and merged if too similar
-- **Confidence scores**: Have the model output confidence per classification to flag uncertain assignments
 
 ## Docs
 
